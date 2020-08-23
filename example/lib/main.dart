@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
                     title: 'Test payment',
                     total: 1.2,
                     currency: 'EUR',
-                    foreignTransactionID: '',
+                    foreignTransactionId: '',
                     saleItemsCount: 0,
                     skipSuccessScreen: false,
                     tip: .0,

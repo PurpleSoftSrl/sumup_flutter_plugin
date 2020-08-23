@@ -79,12 +79,12 @@ class SumupPayment {
     this.currency = 'EUR',
     this.tip = .0,
     this.skipSuccessScreen = false,
-    this.foreignTransactionID,
+    this.foreignTransactionId,
     this.saleItemsCount = 0,
   });
 
   double total, tip;
-  String title, currency, foreignTransactionID;
+  String title, currency, foreignTransactionId;
   bool skipSuccessScreen;
   int saleItemsCount;
 
@@ -94,7 +94,7 @@ class SumupPayment {
         'currency': currency,
         'tip': tip,
         'skipSuccessScreen': skipSuccessScreen,
-        'foreignTransactionID': foreignTransactionID,
+        'foreignTransactionId': foreignTransactionId,
         'saleItemsCount': saleItemsCount,
       };
 }
