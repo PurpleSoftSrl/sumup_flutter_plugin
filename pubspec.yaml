@@ -1,6 +1,8 @@
 name: sumup
 description: Flutter wrapper to use the Sumup SDK.
 version: 0.0.1
+repository: https://github.com/PurpleSoftSrl/sumup_flutter_plugin.git
+homepage: https://purplesoft.io
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
