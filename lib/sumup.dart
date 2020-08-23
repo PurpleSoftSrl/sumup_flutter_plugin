@@ -10,7 +10,8 @@ class Sumup {
   ///
   /// Must be called before anything else
   static Future<SumupPluginResponse> init(String affiliateKey) async {
-    return SumupPluginResponse.fromMap(await _channel.invokeMethod('initSDK', affiliateKey));
+    return SumupPluginResponse.fromMap(
+        await _channel.invokeMethod('initSDK', affiliateKey));
   }
 
   /// Should be called after [init]
@@ -19,12 +20,15 @@ class Sumup {
   }
 
   static Future<bool> get isLoggedIn async {
-    return SumupPluginResponse.fromMap(await _channel.invokeMethod('isLoggedIn')).status;
+    return SumupPluginResponse.fromMap(
+            await _channel.invokeMethod('isLoggedIn'))
+        .status;
   }
 
   /// Returns the current merchant
   static Future<SumupPluginMerchantResponse> get merchant async {
-    var response = SumupPluginResponse.fromMap(await _channel.invokeMethod('getMerchant'));
+    var response =
+        SumupPluginResponse.fromMap(await _channel.invokeMethod('getMerchant'));
 
     return SumupPluginMerchantResponse.fromMap(response.message);
   }
@@ -33,13 +37,15 @@ class Sumup {
   ///
   /// Login required
   static Future<SumupPluginResponse> openSettings() async {
-    return SumupPluginResponse.fromMap(await _channel.invokeMethod('openSettings'));
+    return SumupPluginResponse.fromMap(
+        await _channel.invokeMethod('openSettings'));
   }
 
   /// Starts a checkout process with [paymentRequest]
   ///
   /// Login required
-  static Future<SumupPluginCheckoutResponse> checkout(SumupPaymentRequest paymentRequest) async {
+  static Future<SumupPluginCheckoutResponse> checkout(
+      SumupPaymentRequest paymentRequest) async {
     var response = SumupPluginResponse.fromMap(
         await _channel.invokeMethod('checkout', paymentRequest.toMap()));
 
@@ -50,7 +56,9 @@ class Sumup {
   ///
   /// Login required
   static Future<bool> get isCheckoutInProgress async {
-    return SumupPluginResponse.fromMap(await _channel.invokeMethod('isCheckoutInProgress')).status;
+    return SumupPluginResponse.fromMap(
+            await _channel.invokeMethod('isCheckoutInProgress'))
+        .status;
   }
 
   static Future<SumupPluginResponse> logout() async {
