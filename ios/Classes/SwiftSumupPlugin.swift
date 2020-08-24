@@ -157,15 +157,6 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
     }
     
     private func checkout(request: CheckoutRequest, completion: @escaping ((CheckoutResult) -> Void)) {
-//        let realRequest = CheckoutRequest(
-//            total: request.totalAmount!, title: request.title, currencyCode: request.currencyCode!, paymentOptions: [.cardReader, .mobilePayment]
-//        )
-//
-//        realRequest.foreignTransactionID = request.foreignTransactionID
-//        realRequest.saleItemsCount = request.saleItemsCount
-//        realRequest.skipScreenOptions = request.skipScreenOptions
-//        realRequest.tipAmount = request.tipAmount
-        
         SumUpSDK.checkout(with: request, from: topController())
         { (result: CheckoutResult?, _: Error?) in
             if result != nil {

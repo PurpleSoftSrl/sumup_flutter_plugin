@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'sumup'
-  s.version          = '0.0.1'
+  s.version          = '0.0.3'
   s.summary          = 'A new flutter plugin project.'
   s.description      = <<-DESC
 A new flutter plugin project.
@@ -15,8 +15,8 @@ A new flutter plugin project.
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.dependency 'SumUpSDK'
-  s.platform = :ios, '8.0'
+  s.dependency 'SumUpSDK', '3.4.0'
+  s.platform = :ios, '9.0'
 
   # Flutter.framework does not contain a i386 slice. Only x86_64 simulators are supported.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'VALID_ARCHS[sdk=iphonesimulator*]' => 'x86_64' }
