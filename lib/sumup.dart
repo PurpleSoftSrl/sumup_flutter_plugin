@@ -71,6 +71,8 @@ class SumupPaymentRequest {
   SumupPaymentRequest(this.payment, {this.info});
 
   SumupPayment payment;
+
+  /// All the additional information associated with this payment
   Map<String, String> info;
 
   Map<String, dynamic> toMap() => {
@@ -92,8 +94,15 @@ class SumupPayment {
   });
 
   double total, tip;
-  String title, currency, foreignTransactionId;
+
+  String title, currency;
+
+  /// An identifier associated with the transaction that can be used to retrieve details related to the transaction
+  String foreignTransactionId;
+
+  /// Skips success screen. Useful if you want to provide your own success message.
   bool skipSuccessScreen;
+
   int saleItemsCount;
 
   Map<String, dynamic> toMap() => {
@@ -115,15 +124,15 @@ class SumupPluginResponse {
     this.message,
   });
 
-  String methodName;
-  bool status;
-  Map<dynamic, dynamic> message;
-
   SumupPluginResponse.fromMap(Map<dynamic, dynamic> response) {
     methodName = response['methodName'];
     status = response['status'];
     message = response['message'];
   }
+
+  String methodName;
+  bool status;
+  Map<dynamic, dynamic> message;
 
   String toString() {
     return 'Method: $methodName, status: $status, message: $message';
@@ -131,6 +140,10 @@ class SumupPluginResponse {
 }
 
 // TODO add products field
+/// Checkout response object
+///
+/// Contains all the transaction informations.
+/// Some fields are available for Android only.
 class SumupPluginCheckoutResponse {
   SumupPluginCheckoutResponse({
     this.success,
@@ -147,22 +160,6 @@ class SumupPluginCheckoutResponse {
     this.entryMode,
     this.installments,
   });
-
-  String transactionCode;
-  bool success;
-  String cardLastDigits;
-  String cardType;
-  double amount;
-  double vatAmount;
-  double tipAmount;
-  String currency;
-  String paymentType;
-  String entryMode;
-  int installments;
-
-  // Android only
-  bool receiptSent;
-  String foreignTransactionId;
 
   SumupPluginCheckoutResponse.fromMap(Map<dynamic, dynamic> response) {
     success = response['success'];
@@ -185,21 +182,50 @@ class SumupPluginCheckoutResponse {
     }
   }
 
+  /// Transaction's outcome
+  bool success;
+
+  String transactionCode;
+  String cardLastDigits;
+  String cardType;
+
+  /// Total amount including tip and VAT
+  double amount;
+
+  double vatAmount;
+  double tipAmount;
+  String currency;
+  String paymentType;
+  String entryMode;
+  int installments;
+
+  /// **Android only**
+  bool receiptSent;
+
+  /// **Android only**
+  String foreignTransactionId;
+
   String toString() {
     return 'Success: $success, transactionCode: $transactionCode, amount: $amount, currency: $currency';
   }
 }
 
+/// Merchant response object.
+///
+/// Contains current merchant code and currency code.
 class SumupPluginMerchantResponse {
-  SumupPluginMerchantResponse({this.merchantCode, this.currencyCode});
-
-  String merchantCode;
-  String currencyCode;
+  SumupPluginMerchantResponse({
+    this.merchantCode,
+    this.currencyCode,
+  });
 
   SumupPluginMerchantResponse.fromMap(Map<dynamic, dynamic> response) {
     merchantCode = response['merchantCode'];
     currencyCode = response['currencyCode'];
   }
+
+  String merchantCode;
+  String currencyCode;
 
   String toString() {
     return 'MerchantCode: $merchantCode, currencyCode: $currencyCode';
