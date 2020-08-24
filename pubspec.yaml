@@ -1,6 +1,6 @@
 name: sumup
 description: Flutter wrapper to use the Sumup SDK. With this plugin, your app can easily connect to a Sumup terminal, login and accept card payments on Android and iOS.
-version: 0.0.1
+version: 0.0.2
 repository: https://github.com/PurpleSoftSrl/sumup_flutter_plugin.git
 homepage: https://purplesoft.io
 

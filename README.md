@@ -5,7 +5,14 @@ A Flutter wrapper to use the Sumup SDK.
 With this plugin, your app can easily connect to a Sumup terminal,
 login and accept card payments on Android and iOS.
 
-# Installing
+## Prerequisites
+
+1) Registered for a merchant account via SumUp's [country websites](https://sumup.com) (or received a test account).
+2) Received SumUp card terminal: Air, Air Lite, PIN+ terminal, Chip & Signature reader, or SumUp Air Register.
+3) Requested an Affiliate (Access) Key and registered your application ID via [SumUp Dashboard](https://me.sumup.com/developers) for Developers.
+4) Deployment Target iOS 9.0 or later.
+
+## Installing
 
 Add sumup to your pubspec.yaml:
 
