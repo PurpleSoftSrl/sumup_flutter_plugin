@@ -280,7 +280,7 @@ fun TransactionInfo.toMap(): Map<String, Any?> {
             "installments" to installments,
             "card" to card.toMap(),
             "merchantCode" to merchantCode,
-            "foreignTransactionId" to foreignTransactionId,
+            "foreignTransactionId" to foreignTransactionId
             //inaccessible properties
             //"products" to products.map { product -> mapOf<String, Any?>("name" to product.name, "quantity" to product.quantity, "price" to product.price) },
     )
