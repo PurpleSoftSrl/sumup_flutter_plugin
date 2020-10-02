@@ -1,3 +1,7 @@
+## 0.0.4
+
+* Fixed syntax error in android
+
 ## 0.0.3
 
 * Fixed SumUpSDK version in podspec
