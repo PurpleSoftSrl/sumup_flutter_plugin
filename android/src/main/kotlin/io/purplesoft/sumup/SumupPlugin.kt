@@ -2,6 +2,7 @@ package io.purplesoft.sumup
 
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.util.Log
 import androidx.annotation.NonNull
@@ -47,6 +48,7 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         Log.d(TAG, "onAttachedToActivity")
         activity = binding.activity
+        activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         binding.addActivityResultListener(this)
     }
 
@@ -80,6 +82,7 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
             "isLoggedIn" -> isLoggedIn().flutterResult()
             "getMerchant" -> getMerchant().flutterResult()
             "openSettings" -> openSettings()
+            "wakeUpTerminal" -> wakeUpTerminal()
             "checkout" -> checkout(call.argument<Map<String, String>>("payment")!!, call.argument<Map<String, String>>("info"))
             "isCheckoutInProgress" -> isCheckoutInProgress().flutterResult()
             "logout" -> logout().flutterResult()
@@ -132,7 +135,9 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
     private fun openSettings() {
         SumUpAPI.openPaymentSettingsActivity(activity, 3)
     }
-
+    private fun wakeUpTerminal() {
+        SumUpAPI.prepareForCheckout()
+    }
     private fun checkout(@NonNull args: Map<String, Any?>, @Nullable info: Map<String, String>?) {
         Log.d(TAG, "checkout")
         val payment = builder() // mandatory parameters
