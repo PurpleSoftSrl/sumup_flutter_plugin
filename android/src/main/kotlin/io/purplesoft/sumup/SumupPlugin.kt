@@ -147,9 +147,9 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
 
         if (args["tip"] != null) payment.tip((args["tip"] as Double).toBigDecimal())
 
-        if (args["receiptEmail"] != null) payment.receiptEmail(args["receiptEmail"] as String?)
+        if (info?.get("receiptEmail") != null) payment.receiptEmail(info?.get("receiptEmail") as String?)
 
-        if (args["receiptSMS"] != null) payment.receiptSMS(args["receiptSMS"] as String?)
+        if (info?.get("receiptSMS") != null) payment.receiptSMS(info?.get("receiptSMS") as String?)
 
         if (args["foreignTransactionId"] != null) payment.foreignTransactionId(args["foreignTransactionId"] as String?)
 
@@ -186,6 +186,10 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
         Log.d(TAG, "onActivityResult - RequestCode: $requestCode - Result Code: $resultCode")
+        
+        val resulCodes = intArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
+
+        if (resultCode !in resulCodes) return false
 
         val currentOp: SumUpPluginResponseWrapper = when (SumUpTask.valueOf(requestCode)) {
             SumUpTask.LOGIN -> operations["login"]!!
@@ -209,17 +213,18 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
                 SumUpTask.CHECKOUT -> {
                     val txCode = extra.getString(SumUpAPI.Response.TX_CODE)
                     val receiptSent = extra.getBoolean(SumUpAPI.Response.RECEIPT_SENT)
-                    val txInfo: TransactionInfo = extra.getParcelable(SumUpAPI.Response.TX_INFO)!!
+                    val txInfo: TransactionInfo? = extra.getParcelable(SumUpAPI.Response.TX_INFO)
 
                     currentOp.response.message = mutableMapOf(
                             "responseCode" to resultCodeInt,
                             "responseMessage" to resultMessage,
                             "txCode" to txCode,
                             "receiptSent" to receiptSent,
-                            "requestCode" to requestCode
+                            "requestCode" to requestCode,
+                            "success" to resultCodeBoolean
                             )
 
-                    currentOp.response.message.putAll(txInfo.toMap())
+                    txInfo?.toMap()?.let { currentOp.response.message.putAll(it) }
 
                     currentOp.flutterResult()
                 }
@@ -240,7 +245,7 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
             } else {
                 currentOp.response.message = mutableMapOf("errors" to "Intent Data and/or Extras are null or empty")
                 currentOp.response.status = false
-                currentOp.flutterResult()
+                //currentOp.flutterResult()
             }
         }
         return currentOp.response.status
