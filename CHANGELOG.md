@@ -1,3 +1,7 @@
+## 0.0.5
+
+* Fixed checkout parameters
+
 ## 0.0.4
 
 * Fixed syntax error in android
