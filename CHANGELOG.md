@@ -1,3 +1,9 @@
+## 0.1.0
+
+* Added checks to prevent crashes from the native platforms, in particular:
+    * All the functions that require the native SDK to be initialized throw an exception if the SDK is not initialized
+    * All the functions that require login throw an exception if user is not logged in
+
 ## 0.0.5
 
 * Fixed checkout parameters
