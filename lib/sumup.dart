@@ -6,16 +6,26 @@ import 'package:flutter/services.dart';
 class Sumup {
   static const MethodChannel _channel = const MethodChannel('sumup');
 
+  static bool _isInitialized = false;
+
   /// Initializes Sumup SDK with your [affiliateKey]
   ///
   /// Must be called before anything else
   static Future<SumupPluginResponse> init(String affiliateKey) async {
-    return SumupPluginResponse.fromMap(
+    final response = SumupPluginResponse.fromMap(
         await _channel.invokeMethod('initSDK', affiliateKey));
+    if (response.status) {
+      _isInitialized = true;
+    }
+    return response;
   }
 
   /// Should be called after [init]
   static Future<SumupPluginResponse> login() async {
+    if (!_isInitialized) {
+      throw Exception(
+          'SumUp SDK is not initialized. You should call Sumup.init(affiliateKey)');
+    }
     return SumupPluginResponse.fromMap(await _channel.invokeMethod('login'));
   }
 
@@ -27,9 +37,8 @@ class Sumup {
 
   /// Returns the current merchant
   static Future<SumupPluginMerchantResponse> get merchant async {
-    var response =
+    final response =
         SumupPluginResponse.fromMap(await _channel.invokeMethod('getMerchant'));
-
     return SumupPluginMerchantResponse.fromMap(response.message);
   }
 
