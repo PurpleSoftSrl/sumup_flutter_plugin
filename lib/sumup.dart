@@ -37,6 +37,16 @@ class Sumup {
 
   /// Returns the current merchant
   static Future<SumupPluginMerchantResponse> get merchant async {
+    if (!_isInitialized) {
+      throw Exception(
+          'SumUp SDK is not initialized. You should call Sumup.init(affiliateKey)');
+    }
+
+    final isLogged = await isLoggedIn;
+    if (!isLogged) {
+      throw Exception('Not logged in. You must login before.');
+    }
+
     final response =
         SumupPluginResponse.fromMap(await _channel.invokeMethod('getMerchant'));
     return SumupPluginMerchantResponse.fromMap(response.message);
@@ -46,6 +56,16 @@ class Sumup {
   ///
   /// Login required
   static Future<SumupPluginResponse> openSettings() async {
+    if (!_isInitialized) {
+      throw Exception(
+          'SumUp SDK is not initialized. You should call Sumup.init(affiliateKey)');
+    }
+
+    final isLogged = await isLoggedIn;
+    if (!isLogged) {
+      throw Exception('Not logged in. You must login before.');
+    }
+
     return SumupPluginResponse.fromMap(
         await _channel.invokeMethod('openSettings'));
   }
@@ -54,6 +74,16 @@ class Sumup {
   ///
   /// Login required
   static Future<SumupPluginResponse> wakeUpTerminal() async {
+    if (!_isInitialized) {
+      throw Exception(
+          'SumUp SDK is not initialized. You should call Sumup.init(affiliateKey)');
+    }
+
+    final isLogged = await isLoggedIn;
+    if (!isLogged) {
+      throw Exception('Not logged in. You must login before.');
+    }
+
     return SumupPluginResponse.fromMap(
         await _channel.invokeMethod('wakeUpTerminal'));
   }
@@ -63,22 +93,50 @@ class Sumup {
   /// Login required
   static Future<SumupPluginCheckoutResponse> checkout(
       SumupPaymentRequest paymentRequest) async {
-    var response = SumupPluginResponse.fromMap(
+    if (!_isInitialized) {
+      throw Exception(
+          'SumUp SDK is not initialized. You should call Sumup.init(affiliateKey)');
+    }
+
+    final isLogged = await isLoggedIn;
+    if (!isLogged) {
+      throw Exception('Not logged in. You must login before.');
+    }
+
+    final response = SumupPluginResponse.fromMap(
         await _channel.invokeMethod('checkout', paymentRequest.toMap()));
 
     return SumupPluginCheckoutResponse.fromMap(response.message);
   }
 
-  /// Only available for iOS
+  /// Only available for iOS.
+  /// On Android always returns false.
   ///
   /// Login required
   static Future<bool> get isCheckoutInProgress async {
-    return SumupPluginResponse.fromMap(
+    if (!_isInitialized) {
+      throw Exception(
+          'SumUp SDK is not initialized. You should call Sumup.init(affiliateKey)');
+    }
+
+    final isLogged = await isLoggedIn;
+    if (!isLogged) {
+      throw Exception('Not logged in. You must login before.');
+    }
+
+    final response = SumupPluginResponse.fromMap(
             await _channel.invokeMethod('isCheckoutInProgress'))
         .status;
+
+    return response;
   }
 
   static Future<SumupPluginResponse> logout() async {
+    if (!_isInitialized) {
+      throw Exception(
+          'SumUp SDK is not initialized. You should call Sumup.init(affiliateKey)');
+    }
+    
     return SumupPluginResponse.fromMap(await _channel.invokeMethod('logout'));
   }
 }
