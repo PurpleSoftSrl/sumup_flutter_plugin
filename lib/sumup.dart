@@ -8,6 +8,20 @@ class Sumup {
 
   static bool _isInitialized = false;
 
+  static void _throwIfNotInitialized() {
+    if (!_isInitialized) {
+      throw Exception(
+          'SumUp SDK is not initialized. You should call Sumup.init(affiliateKey)');
+    }
+  }
+
+  static Future<void> _throwIfNotLoggedIn() async {
+    final isLogged = await isLoggedIn;
+    if (!isLogged) {
+      throw Exception('Not logged in. You must login before.');
+    }
+  }
+
   /// Initializes Sumup SDK with your [affiliateKey]
   ///
   /// Must be called before anything else
@@ -18,13 +32,6 @@ class Sumup {
       _isInitialized = true;
     }
     return response;
-  }
-
-  static void _throwIfNotInitialized() {
-    if (!_isInitialized) {
-      throw Exception(
-          'SumUp SDK is not initialized. You should call Sumup.init(affiliateKey)');
-    }
   }
 
   /// Should be called after [init]
@@ -40,18 +47,11 @@ class Sumup {
         .status;
   }
 
-  static Future<void> _throwIfNotLoggedIn() async {
-    final isLogged = await isLoggedIn;
-    if (!isLogged) {
-      throw Exception('Not logged in. You must login before.');
-    }
-  }
-
   /// Returns the current merchant
   static Future<SumupPluginMerchantResponse> get merchant async {
     _throwIfNotInitialized();
     await _throwIfNotLoggedIn();
-    
+
     final response =
         SumupPluginResponse.fromMap(await _channel.invokeMethod('getMerchant'));
     return SumupPluginMerchantResponse.fromMap(response.message);
