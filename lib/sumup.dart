@@ -40,15 +40,18 @@ class Sumup {
         .status;
   }
 
-  /// Returns the current merchant
-  static Future<SumupPluginMerchantResponse> get merchant async {
-    _throwIfNotInitialized();
-
+  static Future<void> _throwIfNotLoggedIn() async {
     final isLogged = await isLoggedIn;
     if (!isLogged) {
       throw Exception('Not logged in. You must login before.');
     }
+  }
 
+  /// Returns the current merchant
+  static Future<SumupPluginMerchantResponse> get merchant async {
+    _throwIfNotInitialized();
+    await _throwIfNotLoggedIn();
+    
     final response =
         SumupPluginResponse.fromMap(await _channel.invokeMethod('getMerchant'));
     return SumupPluginMerchantResponse.fromMap(response.message);
@@ -59,11 +62,7 @@ class Sumup {
   /// Login required
   static Future<SumupPluginResponse> openSettings() async {
     _throwIfNotInitialized();
-
-    final isLogged = await isLoggedIn;
-    if (!isLogged) {
-      throw Exception('Not logged in. You must login before.');
-    }
+    await _throwIfNotLoggedIn();
 
     return SumupPluginResponse.fromMap(
         await _channel.invokeMethod('openSettings'));
@@ -74,11 +73,7 @@ class Sumup {
   /// Login required
   static Future<SumupPluginResponse> wakeUpTerminal() async {
     _throwIfNotInitialized();
-
-    final isLogged = await isLoggedIn;
-    if (!isLogged) {
-      throw Exception('Not logged in. You must login before.');
-    }
+    await _throwIfNotLoggedIn();
 
     return SumupPluginResponse.fromMap(
         await _channel.invokeMethod('wakeUpTerminal'));
@@ -90,11 +85,7 @@ class Sumup {
   static Future<SumupPluginCheckoutResponse> checkout(
       SumupPaymentRequest paymentRequest) async {
     _throwIfNotInitialized();
-
-    final isLogged = await isLoggedIn;
-    if (!isLogged) {
-      throw Exception('Not logged in. You must login before.');
-    }
+    await _throwIfNotLoggedIn();
 
     final response = SumupPluginResponse.fromMap(
         await _channel.invokeMethod('checkout', paymentRequest.toMap()));
@@ -108,11 +99,7 @@ class Sumup {
   /// Login required
   static Future<bool> get isCheckoutInProgress async {
     _throwIfNotInitialized();
-
-    final isLogged = await isLoggedIn;
-    if (!isLogged) {
-      throw Exception('Not logged in. You must login before.');
-    }
+    await _throwIfNotLoggedIn();
 
     final response = SumupPluginResponse.fromMap(
             await _channel.invokeMethod('isCheckoutInProgress'))
