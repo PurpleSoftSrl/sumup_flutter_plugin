@@ -20,16 +20,21 @@ class Sumup {
     return response;
   }
 
-  /// Should be called after [init]
-  static Future<SumupPluginResponse> login() async {
+  static void _throwIfNotInitialized() {
     if (!_isInitialized) {
       throw Exception(
           'SumUp SDK is not initialized. You should call Sumup.init(affiliateKey)');
     }
+  }
+
+  /// Should be called after [init]
+  static Future<SumupPluginResponse> login() async {
+    _throwIfNotInitialized();
     return SumupPluginResponse.fromMap(await _channel.invokeMethod('login'));
   }
 
   static Future<bool> get isLoggedIn async {
+    _throwIfNotInitialized();
     return SumupPluginResponse.fromMap(
             await _channel.invokeMethod('isLoggedIn'))
         .status;
@@ -37,10 +42,7 @@ class Sumup {
 
   /// Returns the current merchant
   static Future<SumupPluginMerchantResponse> get merchant async {
-    if (!_isInitialized) {
-      throw Exception(
-          'SumUp SDK is not initialized. You should call Sumup.init(affiliateKey)');
-    }
+    _throwIfNotInitialized();
 
     final isLogged = await isLoggedIn;
     if (!isLogged) {
@@ -56,10 +58,7 @@ class Sumup {
   ///
   /// Login required
   static Future<SumupPluginResponse> openSettings() async {
-    if (!_isInitialized) {
-      throw Exception(
-          'SumUp SDK is not initialized. You should call Sumup.init(affiliateKey)');
-    }
+    _throwIfNotInitialized();
 
     final isLogged = await isLoggedIn;
     if (!isLogged) {
@@ -74,10 +73,7 @@ class Sumup {
   ///
   /// Login required
   static Future<SumupPluginResponse> wakeUpTerminal() async {
-    if (!_isInitialized) {
-      throw Exception(
-          'SumUp SDK is not initialized. You should call Sumup.init(affiliateKey)');
-    }
+    _throwIfNotInitialized();
 
     final isLogged = await isLoggedIn;
     if (!isLogged) {
@@ -93,10 +89,7 @@ class Sumup {
   /// Login required
   static Future<SumupPluginCheckoutResponse> checkout(
       SumupPaymentRequest paymentRequest) async {
-    if (!_isInitialized) {
-      throw Exception(
-          'SumUp SDK is not initialized. You should call Sumup.init(affiliateKey)');
-    }
+    _throwIfNotInitialized();
 
     final isLogged = await isLoggedIn;
     if (!isLogged) {
@@ -114,10 +107,7 @@ class Sumup {
   ///
   /// Login required
   static Future<bool> get isCheckoutInProgress async {
-    if (!_isInitialized) {
-      throw Exception(
-          'SumUp SDK is not initialized. You should call Sumup.init(affiliateKey)');
-    }
+    _throwIfNotInitialized();
 
     final isLogged = await isLoggedIn;
     if (!isLogged) {
@@ -132,11 +122,8 @@ class Sumup {
   }
 
   static Future<SumupPluginResponse> logout() async {
-    if (!_isInitialized) {
-      throw Exception(
-          'SumUp SDK is not initialized. You should call Sumup.init(affiliateKey)');
-    }
-    
+    _throwIfNotInitialized();
+
     return SumupPluginResponse.fromMap(await _channel.invokeMethod('logout'));
   }
 }
