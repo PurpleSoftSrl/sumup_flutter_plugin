@@ -16,7 +16,7 @@ class Sumup {
   }
 
   static Future<void> _throwIfNotLoggedIn() async {
-    final isLogged = await isLoggedIn;
+    final isLogged = await (isLoggedIn as FutureOr<bool>);
     if (!isLogged) {
       throw Exception('Not logged in. You must login before.');
     }
@@ -40,7 +40,7 @@ class Sumup {
     return SumupPluginResponse.fromMap(await _channel.invokeMethod('login'));
   }
 
-  static Future<bool> get isLoggedIn async {
+  static Future<bool?> get isLoggedIn async {
     _throwIfNotInitialized();
     return SumupPluginResponse.fromMap(
             await _channel.invokeMethod('isLoggedIn'))
@@ -54,7 +54,7 @@ class Sumup {
 
     final response =
         SumupPluginResponse.fromMap(await _channel.invokeMethod('getMerchant'));
-    return SumupPluginMerchantResponse.fromMap(response.message);
+    return SumupPluginMerchantResponse.fromMap(response.message!);
   }
 
   /// Sets up card terminal
@@ -90,14 +90,14 @@ class Sumup {
     final response = SumupPluginResponse.fromMap(
         await _channel.invokeMethod('checkout', paymentRequest.toMap()));
 
-    return SumupPluginCheckoutResponse.fromMap(response.message);
+    return SumupPluginCheckoutResponse.fromMap(response.message!);
   }
 
   /// Only available for iOS.
   /// On Android always returns false.
   ///
   /// Login required
-  static Future<bool> get isCheckoutInProgress async {
+  static Future<bool?> get isCheckoutInProgress async {
     _throwIfNotInitialized();
     await _throwIfNotLoggedIn();
 
@@ -122,7 +122,7 @@ class SumupPaymentRequest {
   SumupPayment payment;
 
   /// All the additional information associated with this payment
-  Map<String, String> info;
+  Map<String, String>? info;
 
   Map<String, dynamic> toMap() => {
         'payment': payment.toMap(),
@@ -142,12 +142,12 @@ class SumupPayment {
     this.saleItemsCount = 0,
   });
 
-  double total, tip;
+  double? total, tip;
 
-  String title, currency;
+  String? title, currency;
 
   /// An identifier associated with the transaction that can be used to retrieve details related to the transaction
-  String foreignTransactionId;
+  String? foreignTransactionId;
 
   /// Skips success screen. Useful if you want to provide your own success message.
   bool skipSuccessScreen;
@@ -167,21 +167,14 @@ class SumupPayment {
 
 /// Response returned from native platform
 class SumupPluginResponse {
-  SumupPluginResponse({
-    this.methodName,
-    this.status,
-    this.message,
-  });
-
-  SumupPluginResponse.fromMap(Map<dynamic, dynamic> response) {
-    methodName = response['methodName'];
-    status = response['status'];
-    message = response['message'];
-  }
+  SumupPluginResponse.fromMap(Map<dynamic, dynamic> response)
+      : methodName = response['methodName'],
+        status = response['status'],
+        message = response['message'];
 
   String methodName;
   bool status;
-  Map<dynamic, dynamic> message;
+  Map<dynamic, dynamic>? message;
 
   String toString() {
     return 'Method: $methodName, status: $status, message: $message';
@@ -232,27 +225,27 @@ class SumupPluginCheckoutResponse {
   }
 
   /// Transaction's outcome
-  bool success;
+  bool? success;
 
-  String transactionCode;
-  String cardLastDigits;
-  String cardType;
+  String? transactionCode;
+  String? cardLastDigits;
+  String? cardType;
 
   /// Total amount including tip and VAT
-  double amount;
+  double? amount;
 
-  double vatAmount;
-  double tipAmount;
-  String currency;
-  String paymentType;
-  String entryMode;
-  int installments;
-
-  /// **Android only**
-  bool receiptSent;
+  double? vatAmount;
+  double? tipAmount;
+  String? currency;
+  String? paymentType;
+  String? entryMode;
+  int? installments;
 
   /// **Android only**
-  String foreignTransactionId;
+  bool? receiptSent;
+
+  /// **Android only**
+  String? foreignTransactionId;
 
   String toString() {
     return 'Success: $success, transactionCode: $transactionCode, amount: $amount, currency: $currency';
@@ -273,8 +266,8 @@ class SumupPluginMerchantResponse {
     currencyCode = response['currencyCode'];
   }
 
-  String merchantCode;
-  String currencyCode;
+  String? merchantCode;
+  String? currencyCode;
 
   String toString() {
     return 'MerchantCode: $merchantCode, currencyCode: $currencyCode';
