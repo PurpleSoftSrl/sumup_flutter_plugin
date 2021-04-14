@@ -7,12 +7,12 @@ import android.os.Bundle
 import android.util.Log
 import androidx.annotation.NonNull
 import androidx.annotation.Nullable
-import com.sumup.merchant.Models.TransactionInfo
-import com.sumup.merchant.api.SumUpAPI
-import com.sumup.merchant.api.SumUpLogin
-import com.sumup.merchant.api.SumUpPayment.Currency
-import com.sumup.merchant.api.SumUpPayment.builder
-import com.sumup.merchant.api.SumUpState
+import com.sumup.merchant.reader.api.SumUpAPI
+import com.sumup.merchant.reader.api.SumUpLogin
+import com.sumup.merchant.reader.api.SumUpPayment
+import com.sumup.merchant.reader.api.SumUpPayment.builder
+import com.sumup.merchant.reader.api.SumUpState
+import com.sumup.merchant.reader.models.TransactionInfo
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -143,13 +143,13 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
         val payment = builder() // mandatory parameters
                 .total((args["total"] as Double).toBigDecimal()) // minimum 1.00
                 .title(args["title"] as String?)
-                .currency(Currency.valueOf(args["currency"] as String))
+                .currency(SumUpPayment.Currency.valueOf(args["currency"] as String))
 
         if (args["tip"] != null) payment.tip((args["tip"] as Double).toBigDecimal())
 
-        if (info?.get("receiptEmail") != null) payment.receiptEmail(info?.get("receiptEmail") as String?)
+        if (info?.get("receiptEmail") != null) payment.receiptEmail(info["receiptEmail"])
 
-        if (info?.get("receiptSMS") != null) payment.receiptSMS(info?.get("receiptSMS") as String?)
+        if (info?.get("receiptSMS") != null) payment.receiptSMS(info["receiptSMS"])
 
         if (args["foreignTransactionId"] != null) payment.foreignTransactionId(args["foreignTransactionId"] as String?)
 
