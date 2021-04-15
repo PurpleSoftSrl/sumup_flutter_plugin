@@ -1,3 +1,8 @@
+## 0.2.0
+
+* Added null safety support
+* Updated SumUp Sdk
+
 ## 0.1.0
 
 * Added checks to prevent crashes from the native platforms, in particular:
