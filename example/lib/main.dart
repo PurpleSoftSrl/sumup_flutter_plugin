@@ -19,28 +19,28 @@ class MyApp extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              FlatButton(
+              TextButton(
                 onPressed: () async {
                   var init = await Sumup.init(affiliateKey);
                   print(init);
                 },
                 child: Text('Init'),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: () async {
                   var login = await Sumup.login();
                   print(login);
                 },
                 child: Text('Login'),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: () async {
                   var settings = await Sumup.openSettings();
                   print(settings);
                 },
                 child: Text('Open settings'),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: () async {
                   var payment = SumupPayment(
                     title: 'Test payment',
@@ -63,28 +63,28 @@ class MyApp extends StatelessWidget {
                 },
                 child: Text('Checkout'),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: () async {
                   var isLogged = await Sumup.isLoggedIn;
                   print(isLogged);
                 },
                 child: Text('Is logged in'),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: () async {
                   var isInProgress = await Sumup.isCheckoutInProgress;
                   print(isInProgress);
                 },
                 child: Text('Is checkout in progress'),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: () async {
                   var merchant = await Sumup.merchant;
                   print(merchant);
                 },
                 child: Text('Current merchant'),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: () async {
                   var logout = await Sumup.logout();
                   print(logout);
