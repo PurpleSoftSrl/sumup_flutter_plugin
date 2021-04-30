@@ -4,14 +4,14 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'sumup'
-  s.version          = '0.2.0'
-  s.summary          = 'A new flutter plugin project.'
+  s.version          = '0.2.1'
+  s.summary          = 'Flutter wrapper to use the Sumup SDK.'
   s.description      = <<-DESC
-A new flutter plugin project.
+  Flutter wrapper to use the Sumup SDK. With this plugin, your app can easily connect to a Sumup terminal, login and accept card payments on Android and iOS.
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'https://purplesoft.io'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'Purplesoft S.r.l' => 'developers@purplesoft.io' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'

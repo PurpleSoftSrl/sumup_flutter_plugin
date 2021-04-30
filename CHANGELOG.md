@@ -1,3 +1,7 @@
+## 0.2.1
+
+* Fix request orientation landscape on Android
+
 ## 0.2.0
 
 * Added null safety support
