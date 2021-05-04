@@ -16,8 +16,8 @@ class Sumup {
   }
 
   static Future<void> _throwIfNotLoggedIn() async {
-    final isLogged = await (isLoggedIn as FutureOr<bool>);
-    if (!isLogged) {
+    final isLogged = await isLoggedIn;
+    if (isLogged == null || !isLogged) {
       throw Exception('Not logged in. You must login before.');
     }
   }

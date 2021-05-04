@@ -1,3 +1,7 @@
+## 0.2.2
+
+* Fix type cast in login check
+
 ## 0.2.1
 
 * Fix request orientation landscape on Android
