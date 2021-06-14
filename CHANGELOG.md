@@ -1,3 +1,7 @@
+## 0.2.3
+
+* Fix cardType and cardLastDigits null in SumupPluginCheckoutResponse on Android
+
 ## 0.2.2
 
 * Fix type cast in login check

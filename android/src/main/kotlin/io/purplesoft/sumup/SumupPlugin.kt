@@ -277,7 +277,7 @@ enum class SumUpTask(val code: Int) {
 }
 
 fun TransactionInfo.toMap(): Map<String, Any?> {
-
+    val card = card.toMap()
     val m = mutableMapOf(
             "transactionCode" to transactionCode,
             "amount" to amount,
@@ -287,7 +287,8 @@ fun TransactionInfo.toMap(): Map<String, Any?> {
             "paymentType" to paymentType,
             "entryMode" to entryMode,
             "installments" to installments,
-            "card" to card.toMap(),
+            "cardType" to card["type"],
+            "cardLastDigits" to card["last4Digits"],
             "merchantCode" to merchantCode,
             "foreignTransactionId" to foreignTransactionId
             //inaccessible properties
