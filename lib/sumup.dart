@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 
 class Sumup {
+  Sumup._();
+
   static const MethodChannel _channel = const MethodChannel('sumup');
 
   static bool _isInitialized = false;
@@ -26,8 +28,8 @@ class Sumup {
   ///
   /// Must be called before anything else
   static Future<SumupPluginResponse> init(String affiliateKey) async {
-    final response = SumupPluginResponse.fromMap(
-        await _channel.invokeMethod('initSDK', affiliateKey));
+    final method = await _channel.invokeMethod('initSDK', affiliateKey);
+    final response = SumupPluginResponse.fromMap(method);
     if (response.status) {
       _isInitialized = true;
     }
@@ -37,23 +39,22 @@ class Sumup {
   /// Should be called after [init]
   static Future<SumupPluginResponse> login() async {
     _throwIfNotInitialized();
-    return SumupPluginResponse.fromMap(await _channel.invokeMethod('login'));
+    final method = await _channel.invokeMethod('login');
+    return SumupPluginResponse.fromMap(method);
   }
 
   static Future<bool?> get isLoggedIn async {
     _throwIfNotInitialized();
-    return SumupPluginResponse.fromMap(
-            await _channel.invokeMethod('isLoggedIn'))
-        .status;
+    final method = await _channel.invokeMethod('isLoggedIn');
+    return SumupPluginResponse.fromMap(method).status;
   }
 
   /// Returns the current merchant
   static Future<SumupPluginMerchantResponse> get merchant async {
     _throwIfNotInitialized();
     await _throwIfNotLoggedIn();
-
-    final response =
-        SumupPluginResponse.fromMap(await _channel.invokeMethod('getMerchant'));
+    final method = await _channel.invokeMethod('getMerchant');
+    final response = SumupPluginResponse.fromMap(method);
     return SumupPluginMerchantResponse.fromMap(response.message!);
   }
 
@@ -63,9 +64,8 @@ class Sumup {
   static Future<SumupPluginResponse> openSettings() async {
     _throwIfNotInitialized();
     await _throwIfNotLoggedIn();
-
-    return SumupPluginResponse.fromMap(
-        await _channel.invokeMethod('openSettings'));
+    final method = await _channel.invokeMethod('openSettings');
+    return SumupPluginResponse.fromMap(method);
   }
 
   /// Wakes up card terminal before real checkout to speed up bluetooth pairing process
@@ -74,9 +74,8 @@ class Sumup {
   static Future<SumupPluginResponse> wakeUpTerminal() async {
     _throwIfNotInitialized();
     await _throwIfNotLoggedIn();
-
-    return SumupPluginResponse.fromMap(
-        await _channel.invokeMethod('wakeUpTerminal'));
+    final method = await _channel.invokeMethod('wakeUpTerminal');
+    return SumupPluginResponse.fromMap(method);
   }
 
   /// Starts a checkout process with [paymentRequest]
@@ -86,10 +85,9 @@ class Sumup {
       SumupPaymentRequest paymentRequest) async {
     _throwIfNotInitialized();
     await _throwIfNotLoggedIn();
-
-    final response = SumupPluginResponse.fromMap(
-        await _channel.invokeMethod('checkout', paymentRequest.toMap()));
-
+    final request = paymentRequest.toMap();
+    final method = await _channel.invokeMethod('checkout', request);
+    final response = SumupPluginResponse.fromMap(method);
     return SumupPluginCheckoutResponse.fromMap(response.message!);
   }
 
@@ -100,18 +98,14 @@ class Sumup {
   static Future<bool?> get isCheckoutInProgress async {
     _throwIfNotInitialized();
     await _throwIfNotLoggedIn();
-
-    final response = SumupPluginResponse.fromMap(
-            await _channel.invokeMethod('isCheckoutInProgress'))
-        .status;
-
-    return response;
+    final method = await _channel.invokeMethod('isCheckoutInProgress');
+    return SumupPluginResponse.fromMap(method).status;
   }
 
   static Future<SumupPluginResponse> logout() async {
     _throwIfNotInitialized();
-
-    return SumupPluginResponse.fromMap(await _channel.invokeMethod('logout'));
+    final method = await _channel.invokeMethod('logout');
+    return SumupPluginResponse.fromMap(method);
   }
 }
 
