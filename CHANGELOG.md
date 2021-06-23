@@ -1,3 +1,9 @@
+## 0.2.4
+
+* Breaking change: Android minSdkVersion must be 21 or higher
+* Upgraded iOS and Android native SDKs
+* Improved code quality
+
 ## 0.2.3
 
 * Fix cardType and cardLastDigits null in SumupPluginCheckoutResponse on Android
