@@ -166,7 +166,7 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
     private fun isCheckoutInProgress(): SumUpPluginResponseWrapper {
         Log.d(TAG, "isCheckoutInProgress")
         val currentOp = operations["isCheckoutInProgress"]!!
-        currentOp.response.message = mutableMapOf("exception" to "isPaymentProcessing method is not implemented in android")
+        currentOp.response.message = mutableMapOf("exception" to "isCheckoutInProgress method is not implemented in android")
         currentOp.response.status = false
         return currentOp
     }

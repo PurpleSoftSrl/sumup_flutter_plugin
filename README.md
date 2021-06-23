@@ -2,9 +2,9 @@
 
 [![pub package](https://img.shields.io/pub/v/sumup.svg)](https://pub.dev/packages/sumup) [![likes](https://badges.bar/sumup/likes)](https://pub.dev/packages/sumup/score) [![popularity](https://badges.bar/sumup/popularity)](https://pub.dev/packages/sumup/score)  [![pub points](https://badges.bar/sumup/pub%20points)](https://pub.dev/packages/sumup/score)
 
-A Flutter wrapper to use the Sumup SDK.
+A Flutter wrapper to use the SumUp SDK.
 
-With this plugin, your app can easily connect to a Sumup terminal,
+With this plugin, your app can easily connect to a SumUp terminal,
 login and accept card payments on Android and iOS.
 
 ## Prerequisites
@@ -31,7 +31,7 @@ import 'package:sumup/sumup.dart';
 
 ## Getting Started
 
-Init Sumup SDK:
+Init SumUp SDK:
 
 ```dart
 Sumup.init(affiliateKey);

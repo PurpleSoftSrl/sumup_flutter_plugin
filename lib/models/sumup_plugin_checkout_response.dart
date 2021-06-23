@@ -2,7 +2,7 @@ import 'dart:io';
 
 // TODO add products field
 
-/// Checkout response object
+/// Checkout response object.
 ///
 /// Contains all the transaction informations.
 /// Some fields are available for Android only.

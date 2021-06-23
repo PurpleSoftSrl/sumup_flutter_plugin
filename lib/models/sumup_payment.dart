@@ -1,4 +1,4 @@
-/// Sumup payment
+/// Payment object.
 class SumupPayment {
   SumupPayment({
     this.title,
