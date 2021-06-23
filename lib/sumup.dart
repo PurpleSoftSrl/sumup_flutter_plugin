@@ -34,7 +34,7 @@ class Sumup {
     }
   }
 
-  /// Initializes Sumup SDK with your [affiliateKey]
+  /// Initializes SumUp SDK with your [affiliateKey]
   ///
   /// Must be called before anything else
   static Future<SumupPluginResponse> init(String affiliateKey) async {

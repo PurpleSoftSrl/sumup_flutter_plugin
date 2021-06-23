@@ -1,6 +1,6 @@
 import 'sumup_payment.dart';
 
-/// Sumup payment request
+/// Payment request object.
 class SumupPaymentRequest {
   SumupPaymentRequest(this.payment, {this.info});
 
