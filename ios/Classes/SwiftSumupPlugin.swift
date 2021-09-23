@@ -76,17 +76,20 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
                                           "products": checkoutResult.additionalInfo?["products"] ?? ""]
                 
                 let resultCard = checkoutResult.additionalInfo?["card"] as? [String: Any?]
-                let cardType = resultCard!["type"]
-                let cardLastDigits = resultCard!["last_4_digits"]
                 
-                if cardType != nil {
-                    pluginResponse.message["cardType"] = cardType!
+                if resultCard != nil {
+                    let cardType = resultCard!["type"]
+                    let cardLastDigits = resultCard!["last_4_digits"]
+                    
+                    if cardType != nil {
+                        pluginResponse.message["cardType"] = cardType!
+                    }
+                    
+                    if cardLastDigits != nil {
+                        pluginResponse.message["cardLastDigits"] = cardType!
+                    }
                 }
-                
-                if cardLastDigits != nil {
-                    pluginResponse.message["cardLastDigits"] = cardType!
-                }
-                
+             
                 result(pluginResponse.toDictionary())
             }
                
