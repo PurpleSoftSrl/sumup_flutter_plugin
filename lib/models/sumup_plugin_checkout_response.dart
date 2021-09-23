@@ -25,22 +25,34 @@ class SumupPluginCheckoutResponse {
 
   SumupPluginCheckoutResponse.fromMap(Map<dynamic, dynamic> response) {
     success = response['success'];
-    transactionCode = response['transactionCode'];
-    amount = response['amount'];
-    currency = response['currency'];
-    vatAmount = response['vatAmount'];
-    tipAmount = response['tipAmount'];
-    paymentType = response['paymentType'];
-    entryMode = response['entryMode'];
-    installments = response['installments'];
-    cardType = response['cardType'];
-    cardLastDigits = response['cardLastDigits'];
+    if (response['transactionCode'] != '')
+      transactionCode = response['transactionCode'];
+    if (response['amount'] != '')
+      amount = response['amount'];
+    if (response['currency'] != '')
+      currency = response['currency'];
+    if (response['vatAmount'] != '')
+      vatAmount = response['vatAmount'];
+    if (response['tipAmount'] != '')
+      tipAmount = response['tipAmount'];
+    if (response['paymentType'] != '')
+      paymentType = response['paymentType'];
+    if (response['entryMode'] != '')
+      entryMode = response['entryMode'];
+    if (response['installments'] != '')
+      installments = response['installments'];
+    if (response['cardType'] != '')
+      cardType = response['cardType'];
+    if (response['cardLastDigits'] != '')
+      cardLastDigits = response['cardLastDigits'];
     //products = response['products'];
 
     // some parameters are available only for Android
     if (Platform.isAndroid) {
-      foreignTransactionId = response['foreignTransactionId'];
-      receiptSent = response['receiptSent'];
+      if (response['foreignTransactionId'] != '')
+        foreignTransactionId = response['foreignTransactionId'];
+      if (response['receiptSent'] != '')
+        receiptSent = response['receiptSent'];
     }
   }
 
