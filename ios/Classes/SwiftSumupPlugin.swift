@@ -40,9 +40,9 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
             
         case "openSettings":
             self.openSettings
-                { (error: String) in
-                    pluginResponse.message = ["result": error]
-                    result(pluginResponse.toDictionary())
+            { (error: String) in
+                pluginResponse.message = ["result": error]
+                result(pluginResponse.toDictionary())
             }
             
         case "checkout":
@@ -63,6 +63,11 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
             
             self.checkout(request: request)
             { (checkoutResult: CheckoutResult) in
+                if checkoutResult.transactionCode == nil { // bottomsheet was dismissed before starting payment
+                    pluginResponse.message = ["success": false]
+                    result(pluginResponse.toDictionary())
+                    return
+                }
                 
                 pluginResponse.message = ["success": checkoutResult.success,
                                           "transactionCode": checkoutResult.transactionCode ?? "",
@@ -89,7 +94,7 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
                 
                 result(pluginResponse.toDictionary())
             }
-               
+            
         case "isCheckoutInProgress":
             let isInProgress = self.isCheckoutInProgress()
             pluginResponse.message = ["result": isInProgress]
@@ -173,12 +178,12 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
     
     private func logout(completion: @escaping ((Bool) -> Void)) {
         SumUpSDK.logout
-            { (_: Bool, error: Error?) in
-                guard (error as NSError?) != nil else {
-                    return completion(true)
-                }
-                
-                return completion(false)
+        { (_: Bool, error: Error?) in
+            guard (error as NSError?) != nil else {
+                return completion(true)
+            }
+            
+            return completion(false)
         }
     }
 }
