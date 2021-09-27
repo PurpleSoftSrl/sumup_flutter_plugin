@@ -89,7 +89,7 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
                 }
                 
                 if cardLastDigits != nil {
-                    pluginResponse.message["cardLastDigits"] = cardType!
+                    pluginResponse.message["cardLastDigits"] = cardLastDigits!
                 }
                 
                 result(pluginResponse.toDictionary())
