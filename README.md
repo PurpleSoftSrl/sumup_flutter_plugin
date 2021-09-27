@@ -12,7 +12,7 @@ login and accept card payments on Android and iOS.
 1) Registered for a merchant account via SumUp's [country websites](https://sumup.it/purplesoft) (or received a test account).
 2) Received SumUp card terminal: Air, Air Lite, PIN+ terminal, Chip & Signature reader, or SumUp Air Register.
 3) Requested an Affiliate (Access) Key and registered your application ID via [SumUp Dashboard](https://me.sumup.com/developers) for Developers.
-4) Deployment Target iOS 10.0 or later.
+4) Deployment Target iOS 10.0 or higher.
 5) Android minSdkVersion 21 or higher.
 
 ## Installing

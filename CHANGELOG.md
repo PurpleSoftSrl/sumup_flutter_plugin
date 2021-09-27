@@ -1,3 +1,8 @@
+## 0.2.5
+
+* Fix crash when dismissing payment bottomsheet during checkout on iOS
+* Fix cardLastDigits in checkout response on iOS
+
 ## 0.2.4
 
 * Breaking change: Android minSdkVersion must be 21 or higher
