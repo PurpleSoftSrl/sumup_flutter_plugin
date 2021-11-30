@@ -49,7 +49,7 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
             let args = call.arguments as! [String: Any]
             let payment = args["payment"] as! [String: Any]
             
-            let request = CheckoutRequest(total: NSDecimalNumber(floatLiteral: payment["total"] as! Double), title: payment["title"] as? String, currencyCode: payment["currency"] as! String, paymentOptions: [.cardReader, .mobilePayment])
+            let request = CheckoutRequest(total: NSDecimalNumber(floatLiteral: payment["total"] as! Double), title: payment["title"] as? String, currencyCode: payment["currency"] as! String)
             
             request.foreignTransactionID = payment["foreignTransactionId"] as? String
             request.tipAmount = NSDecimalNumber(floatLiteral: payment["tip"] as! Double)
