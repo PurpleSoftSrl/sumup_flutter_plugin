@@ -23,8 +23,9 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
             result(pluginResponse.toDictionary())
             
         case "login":
-            self.login { success in
-                pluginResponse.message = ["result": success]
+            self.login { success, reason in
+                pluginResponse.status = success
+                pluginResponse.message = ["result": reason]
                 result(pluginResponse.toDictionary())
             }
         case "isLoggedIn":
@@ -120,10 +121,15 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
         return setupResult
     }
     
-    private func login(completion: @escaping ((Bool) -> Void)) {
+    private func login(completion: @escaping ((Bool, String) -> Void)) {
+        guard !self.isLoggedIn() else {
+            completion(false, "Already logged in")
+            return
+        }
+        
         SumUpSDK.presentLogin(from: topController(), animated: true)
-        { loggedIn, _ in
-            completion(loggedIn)
+        { loggedIn, err in
+            completion(loggedIn, err != nil ? err.debugDescription : "Login successful")
         }
     }
     
