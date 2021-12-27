@@ -206,7 +206,7 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
 
             when (SumUpTask.valueOf(requestCode)) {
                 SumUpTask.LOGIN -> {
-                    currentOp.response.message = mutableMapOf("isLoggedIn" to resultCodeBoolean, "responseCode" to resultCodeInt, "responseMessage" to resultMessage, "requestCode" to requestCode)
+                    currentOp.response.message = mutableMapOf("loginResult" to resultCodeBoolean, "responseCode" to resultCodeInt, "responseMessage" to resultMessage, "requestCode" to requestCode)
                     currentOp.flutterResult()
                 }
                 SumUpTask.CHECKOUT -> {
