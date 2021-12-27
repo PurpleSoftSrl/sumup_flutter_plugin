@@ -1,3 +1,9 @@
+## 0.2.6
+
+* Improve login
+* Android: Upgrade SDK and gradle
+* Deprecate info field in SUmupPaymentRequest 
+
 ## 0.2.5
 
 * Fix crash when dismissing payment bottomsheet during checkout on iOS
