@@ -20,7 +20,7 @@ class SumupPayment {
 
   /// Skips success screen. Useful if you want to provide your own success message.
   bool skipSuccessScreen;
-  
+
   /// Skips failure screen. Useful if you want to provide your own failure message.
   bool skipFailureScreen;
 
