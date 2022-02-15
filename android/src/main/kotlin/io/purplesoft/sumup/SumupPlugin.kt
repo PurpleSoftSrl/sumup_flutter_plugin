@@ -154,6 +154,8 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
 
         if (args["skipSuccessScreen"] != null && args["skipSuccessScreen"] as Boolean) payment.skipSuccessScreen()
 
+        if (args["skipFailureScreen"] != null && args["skipFailureScreen"] as Boolean) payment.skipFailedScreen()
+
         if (!info.isNullOrEmpty()) {
             for (item in info) {
                 payment.addAdditionalInfo(item.key, item.value)

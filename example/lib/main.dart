@@ -48,7 +48,8 @@ class MyApp extends StatelessWidget {
                     currency: 'EUR',
                     foreignTransactionId: '',
                     saleItemsCount: 0,
-                    skipSuccessScreen: false,
+                    skipSuccessScreen: true,
+                    skipFailureScreen: true,
                     tip: .0,
                   );
 

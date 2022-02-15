@@ -6,6 +6,7 @@ class SumupPayment {
     this.currency = 'EUR',
     this.tip = .0,
     this.skipSuccessScreen = false,
+    this.skipFailureScreen = false,
     this.foreignTransactionId,
     this.saleItemsCount = 0,
   });
@@ -19,6 +20,9 @@ class SumupPayment {
 
   /// Skips success screen. Useful if you want to provide your own success message.
   bool skipSuccessScreen;
+  
+  /// Skips failure screen. Useful if you want to provide your own failure message.
+  bool skipFailureScreen;
 
   int saleItemsCount;
 
@@ -28,6 +32,7 @@ class SumupPayment {
         'currency': currency,
         'tip': tip,
         'skipSuccessScreen': skipSuccessScreen,
+        'skipFailureScreen': skipFailureScreen,
         'foreignTransactionId': foreignTransactionId,
         'saleItemsCount': saleItemsCount,
       };

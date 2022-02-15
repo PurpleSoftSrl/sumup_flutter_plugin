@@ -56,15 +56,17 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
             request.tipAmount = NSDecimalNumber(floatLiteral: payment["tip"] as! Double)
             request.saleItemsCount = payment["saleItemsCount"] as! UInt
             
-            if payment["skipSuccessScreen"] as! Bool == true {
-                request.skipScreenOptions = SkipScreenOptions(rawValue: 1)
-            } else {
-                request.skipScreenOptions = SkipScreenOptions(rawValue: 0)
+            if payment["skipSuccessScreen"] as! Bool {
+                request.skipScreenOptions.update(with: SkipScreenOptions.success)
             }
-            
+            if payment["skipFailureScreen"] as! Bool {
+                request.skipScreenOptions.update(with: SkipScreenOptions.failed)
+            }
+
             self.checkout(request: request)
             { (checkoutResult: CheckoutResult) in
-                if checkoutResult.transactionCode == nil { // bottomsheet was dismissed before starting payment
+                if checkoutResult.transactionCode == nil {
+                    // bottomsheet was dismissed before starting payment
                     pluginResponse.message = ["success": false]
                     result(pluginResponse.toDictionary())
                     return
