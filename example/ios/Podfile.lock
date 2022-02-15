@@ -1,6 +1,6 @@
 PODS:
   - Flutter (1.0.0)
-  - sumup (0.2.6):
+  - sumup (0.3.0):
     - Flutter
     - SumUpSDK (= 4.2.0)
   - SumUpSDK (4.2.0)
@@ -21,7 +21,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
-  sumup: 5fad9c9121c0b255576039a3c4566b3ac1096191
+  sumup: 410c68912895446682274100f4fa733c2c803999
   SumUpSDK: e7205e6b062a7c12c78cac0c67da7dd3ac098fcc
 
 PODFILE CHECKSUM: fe0e1ee7f3d1f7d00b11b474b62dd62134535aea

@@ -1,3 +1,9 @@
+## 0.3.0
+
+* Add skipFailureScreen
+* Fix login response
+* Upgrade iOS SDK
+
 ## 0.2.6
 
 * Improve login
