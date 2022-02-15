@@ -2,7 +2,6 @@ package io.purplesoft.sumup
 
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.util.Log
 import androidx.annotation.NonNull
@@ -188,9 +187,9 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
         Log.d(TAG, "onActivityResult - RequestCode: $requestCode - Result Code: $resultCode")
         
-        val resulCodes = intArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
+        val resultCodes = intArrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
 
-        if (resultCode !in resulCodes) return false
+        if (resultCode !in resultCodes) return false
 
         val currentOp: SumUpPluginResponseWrapper = when (SumUpTask.valueOf(requestCode)) {
             SumUpTask.LOGIN -> operations["login"]!!
@@ -238,16 +237,18 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
 
                 }
             }
+        } else if (SumUpTask.valueOf(requestCode) == SumUpTask.SETTINGS) {
+            currentOp.response.message = mutableMapOf("responseCode" to resultCode, "requestCode" to requestCode)
+            currentOp.response.status = true
+            currentOp.flutterResult()
+        } else if (SumUpTask.valueOf(requestCode) == SumUpTask.LOGIN) {
+            currentOp.response.message = mutableMapOf("responseCode" to resultCode, "requestCode" to requestCode)
+            currentOp.response.status = false
+            currentOp.flutterResult()
         } else {
-            if (SumUpTask.valueOf(requestCode) == SumUpTask.SETTINGS) {
-                currentOp.response.message = mutableMapOf("responseCode" to resultCode, "requestCode" to requestCode)
-                currentOp.response.status = true
-                currentOp.flutterResult()
-            } else {
-                currentOp.response.message = mutableMapOf("errors" to "Intent Data and/or Extras are null or empty")
-                currentOp.response.status = false
-                //currentOp.flutterResult()
-            }
+            currentOp.response.message = mutableMapOf("errors" to "Intent Data and/or Extras are null or empty")
+            currentOp.response.status = false
+            //currentOp.flutterResult()
         }
         return currentOp.response.status
     }

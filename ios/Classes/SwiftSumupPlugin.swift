@@ -131,7 +131,11 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
         
         SumUpSDK.presentLogin(from: topController(), animated: true)
         { loggedIn, err in
-            completion(loggedIn, err != nil ? err.debugDescription : "Login successful")
+            if !loggedIn {
+                completion(loggedIn, err != nil ? err.debugDescription : "Login dialog closed")
+            } else {
+                completion(loggedIn, "Login successful")
+            }
         }
     }
     
