@@ -1,3 +1,8 @@
+## 0.3.1
+
+* Android: targetSdkVersion 31
+* Android: fix wakeUpTerminal not returning
+
 ## 0.3.0
 
 * Add skipFailureScreen
