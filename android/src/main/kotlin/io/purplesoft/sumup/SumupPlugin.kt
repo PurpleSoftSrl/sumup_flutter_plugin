@@ -80,7 +80,7 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
             "isLoggedIn" -> isLoggedIn().flutterResult()
             "getMerchant" -> getMerchant().flutterResult()
             "openSettings" -> openSettings()
-            "wakeUpTerminal" -> wakeUpTerminal()
+            "wakeUpTerminal" -> wakeUpTerminal().flutterResult()
             "checkout" -> checkout(call.argument<Map<String, String>>("payment")!!, call.argument<Map<String, String>>("info"))
             "isCheckoutInProgress" -> isCheckoutInProgress().flutterResult()
             "logout" -> logout().flutterResult()
@@ -133,8 +133,15 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
     private fun openSettings() {
         SumUpAPI.openPaymentSettingsActivity(activity, 3)
     }
-    private fun wakeUpTerminal() {
+    private fun wakeUpTerminal(): SumUpPluginResponseWrapper {
+        Log.d(TAG, "wakeUpTerminal")
         SumUpAPI.prepareForCheckout()
+
+        val currentOp = operations["wakeUpTerminal"]!!
+        currentOp.response.message = mutableMapOf("wakeUp" to true)
+        currentOp.response.status = true
+
+        return currentOp
     }
     private fun checkout(@NonNull args: Map<String, Any?>, @Nullable info: Map<String, String>?) {
         Log.d(TAG, "checkout")
@@ -237,7 +244,7 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
 
                 }
             }
-        } else if (SumUpTask.valueOf(requestCode) == SumUpTask.SETTINGS) {
+          } else if (SumUpTask.valueOf(requestCode) == SumUpTask.SETTINGS) {
             currentOp.response.message = mutableMapOf("responseCode" to resultCode, "requestCode" to requestCode)
             currentOp.response.status = true
             currentOp.flutterResult()

@@ -58,7 +58,7 @@ class MyApp extends StatelessWidget {
                     'From': 'Paris',
                     'To': 'Berlin',
                   });
-
+                  var prepare = await Sumup.wakeUpTerminal();
                   var checkout = await Sumup.checkout(request);
                   print(checkout);
                 },
