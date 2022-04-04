@@ -151,10 +151,9 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
                 .currency(SumUpPayment.Currency.valueOf(args["currency"] as String))
 
         if (args["tip"] != null) payment.tip((args["tip"] as Double).toBigDecimal())
-
-        if (info?.get("receiptEmail") != null) payment.receiptEmail(info["receiptEmail"])
-
-        if (info?.get("receiptSMS") != null) payment.receiptSMS(info["receiptSMS"])
+        
+        if (args["customerEmail"] != null) payment.receiptEmail(args["customerEmail"] as String)
+        if (args["customerPhone"] != null) payment.receiptSMS(args["customerPhone"] as String)
 
         if (args["foreignTransactionId"] != null) payment.foreignTransactionId(args["foreignTransactionId"] as String?)
 
@@ -194,7 +193,7 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
         Log.d(TAG, "onActivityResult - RequestCode: $requestCode - Result Code: $resultCode")
         
-        val resultCodes = intArrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
+        val resultCodes = intArrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
 
         if (resultCode !in resultCodes) return false
 

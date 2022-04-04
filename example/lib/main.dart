@@ -55,9 +55,11 @@ class MyApp extends StatelessWidget {
                     currency: 'EUR',
                     foreignTransactionId: '',
                     saleItemsCount: 0,
-                    skipSuccessScreen: true,
+                    skipSuccessScreen: false,
                     skipFailureScreen: true,
                     tip: .0,
+                    customerEmail: null,
+                    customerPhone: null,
                   );
 
                   var request = SumupPaymentRequest(payment);
