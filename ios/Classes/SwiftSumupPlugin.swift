@@ -46,6 +46,12 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
                 result(pluginResponse.toDictionary())
             }
             
+        case "wakeUpTerminal":
+            self.wakeUpTerminal()
+            pluginResponse.status = true
+            pluginResponse.message = ["result": "ok"]
+            result(pluginResponse.toDictionary())
+            
         case "checkout":
             let args = call.arguments as! [String: Any]
             let payment = args["payment"] as! [String: Any]
@@ -171,6 +177,10 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
             
             completion(errorMessage)
         }
+    }
+    
+    private func wakeUpTerminal() {
+        SumUpSDK.prepareForCheckout()
     }
     
     private func checkout(request: CheckoutRequest, completion: @escaping ((CheckoutResult) -> Void)) {

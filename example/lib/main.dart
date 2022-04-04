@@ -42,6 +42,13 @@ class MyApp extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () async {
+                  var prepare = await Sumup.wakeUpTerminal();
+                  print(prepare);
+                },
+                child: Text('Wake up terminal'),
+              ),
+              TextButton(
+                onPressed: () async {
                   var payment = SumupPayment(
                     title: 'Test payment',
                     total: 1.2,
@@ -58,7 +65,6 @@ class MyApp extends StatelessWidget {
                     'From': 'Paris',
                     'To': 'Berlin',
                   });
-                  var prepare = await Sumup.wakeUpTerminal();
                   var checkout = await Sumup.checkout(request);
                   print(checkout);
                 },
