@@ -47,7 +47,7 @@ class Sumup {
   }
 
   /// Shows SumUp login dialog.
-  /// 
+  ///
   /// Should be called after [init].
   static Future<SumupPluginResponse> login() async {
     _throwIfNotInitialized();
@@ -82,7 +82,7 @@ class Sumup {
   }
 
   /// Wakes up card terminal before real checkout to speed up bluetooth pairing process.
-  /// 
+  ///
   /// Don't call this method during checkout because it can lead to checkout failure.
   /// Login required.
   static Future<SumupPluginResponse> wakeUpTerminal() async {

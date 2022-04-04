@@ -22,7 +22,7 @@ class SumupPayment {
   /// Optional payment title, will be visible on merchant transaction history.
   String? title;
 
-  /// Payment currency, defaults to EUR.  
+  /// Payment currency, defaults to EUR.
   String currency;
 
   /// An identifier associated with the transaction that can be used to retrieve details related to the transaction.
@@ -38,7 +38,7 @@ class SumupPayment {
   int saleItemsCount;
 
   /// Optional customer email useful to autofill email field on transaction successful screen.
-  /// 
+  ///
   /// Android only (see https://github.com/sumup/sumup-ios-sdk/issues/74)
   String? customerEmail;
 
