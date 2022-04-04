@@ -1,3 +1,11 @@
+## 0.4.0
+
+* iOS: add wakeUpTerminal
+* Add customerEmail and customerPhone to autofill text fields in transaction successfull screen (Android only)
+* Make required fields non nullable in SumupPayment class
+* Migrate example to null safety
+* Improve documentation
+
 ## 0.3.1
 
 * Android: targetSdkVersion 31
