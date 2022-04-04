@@ -60,11 +60,7 @@ class MyApp extends StatelessWidget {
                     tip: .0,
                   );
 
-                  var request = SumupPaymentRequest(payment, info: {
-                    'AccountId': 'taxi0334',
-                    'From': 'Paris',
-                    'To': 'Berlin',
-                  });
+                  var request = SumupPaymentRequest(payment);
                   var checkout = await Sumup.checkout(request);
                   print(checkout);
                 },

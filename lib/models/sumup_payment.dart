@@ -2,7 +2,7 @@
 class SumupPayment {
   SumupPayment({
     this.title,
-    this.total,
+    required this.total,
     this.currency = 'EUR',
     this.tip = .0,
     this.skipSuccessScreen = false,
@@ -11,9 +11,17 @@ class SumupPayment {
     this.saleItemsCount = 0,
   });
 
-  double? total, tip;
+  /// Total payment amount.
+  double total;
 
-  String? title, currency;
+  /// Optional tip, defaults to 0.
+  double tip;
+
+  /// Optional payment title, will be visible on merchant transaction history.
+  String? title;
+
+  /// Payment currency, defaults to EUR.  
+  String currency;
 
   /// An identifier associated with the transaction that can be used to retrieve details related to the transaction.
   String? foreignTransactionId;
