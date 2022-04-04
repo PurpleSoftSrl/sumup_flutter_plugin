@@ -34,7 +34,7 @@ class Sumup {
     }
   }
 
-  /// Initializes SumUp SDK with your [affiliateKey]
+  /// Initializes SumUp SDK with your [affiliateKey].
   ///
   /// Must be called before anything else
   static Future<SumupPluginResponse> init(String affiliateKey) async {
@@ -46,20 +46,23 @@ class Sumup {
     return response;
   }
 
-  /// Should be called after [init]
+  /// Shows SumUp login dialog.
+  /// 
+  /// Should be called after [init].
   static Future<SumupPluginResponse> login() async {
     _throwIfNotInitialized();
     final method = await _channel.invokeMethod('login');
     return SumupPluginResponse.fromMap(method);
   }
 
+  /// Returns whether merchant is already logged in.
   static Future<bool?> get isLoggedIn async {
     _throwIfNotInitialized();
     final method = await _channel.invokeMethod('isLoggedIn');
     return SumupPluginResponse.fromMap(method).status;
   }
 
-  /// Returns the current merchant
+  /// Returns the current merchant.
   static Future<SumupPluginMerchantResponse> get merchant async {
     _throwIfNotInitialized();
     await _throwIfNotLoggedIn();
@@ -68,9 +71,9 @@ class Sumup {
     return SumupPluginMerchantResponse.fromMap(response.message!);
   }
 
-  /// Sets up card terminal
+  /// Opens SumUp dialog to connect to a card terminal.
   ///
-  /// Login required
+  /// Login required.
   static Future<SumupPluginResponse> openSettings() async {
     _throwIfNotInitialized();
     await _throwIfNotLoggedIn();
@@ -78,9 +81,10 @@ class Sumup {
     return SumupPluginResponse.fromMap(method);
   }
 
-  /// Wakes up card terminal before real checkout to speed up bluetooth pairing process
-  ///
-  /// Login required
+  /// Wakes up card terminal before real checkout to speed up bluetooth pairing process.
+  /// 
+  /// Don't call this method during checkout because it can lead to checkout failure.
+  /// Login required.
   static Future<SumupPluginResponse> wakeUpTerminal() async {
     _throwIfNotInitialized();
     await _throwIfNotLoggedIn();
@@ -88,9 +92,9 @@ class Sumup {
     return SumupPluginResponse.fromMap(method);
   }
 
-  /// Starts a checkout process with [paymentRequest]
+  /// Starts a checkout process with [paymentRequest].
   ///
-  /// Login required
+  /// Login required.
   static Future<SumupPluginCheckoutResponse> checkout(
       SumupPaymentRequest paymentRequest) async {
     _throwIfNotInitialized();
@@ -104,7 +108,7 @@ class Sumup {
   /// Only available for iOS.
   /// On Android always returns false.
   ///
-  /// Login required
+  /// Login required.
   static Future<bool?> get isCheckoutInProgress async {
     _throwIfNotInitialized();
     await _throwIfNotLoggedIn();
@@ -112,6 +116,7 @@ class Sumup {
     return SumupPluginResponse.fromMap(method).status;
   }
 
+  /// Performs logout.
   static Future<SumupPluginResponse> logout() async {
     _throwIfNotInitialized();
     final method = await _channel.invokeMethod('logout');

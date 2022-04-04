@@ -15,7 +15,7 @@ class SumupPayment {
 
   String? title, currency;
 
-  /// An identifier associated with the transaction that can be used to retrieve details related to the transaction
+  /// An identifier associated with the transaction that can be used to retrieve details related to the transaction.
   String? foreignTransactionId;
 
   /// Skips success screen. Useful if you want to provide your own success message.
