@@ -50,6 +50,12 @@ Choose your preferred terminal:
 Sumup.openSettings();
 ```
 
+Prepare terminal for checkout:
+
+```dart
+Sumup.wakeUpTerminal();
+```
+
 Complete a transaction:
 
 ```dart
@@ -63,13 +69,7 @@ var payment = SumupPayment(
     tip: .0,
 );
 
-var request = SumupPaymentRequest(
-    payment,
-    info: {
-        'AccountId': 'taxi0334',
-        'From': 'Paris',
-        'To': 'Berlin',
-    });
+var request = SumupPaymentRequest(payment);
 
 Sumup.checkout(request);
 ```
@@ -86,6 +86,8 @@ Sumup.isLoggedIn;
 Sumup.merchant;
 
 Sumup.openSettings();
+
+Sumup.wakeUpTerminal();
 
 Sumup.checkout(request);
 
