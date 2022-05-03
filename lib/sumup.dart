@@ -55,6 +55,15 @@ class Sumup {
     return SumupPluginResponse.fromMap(method);
   }
 
+  /// Uses Transparent authentication to login to SumUp SDK with supplied token.
+  ///
+  /// Should be called after [init].
+  static Future<SumupPluginResponse> loginWithToken(String token) async {
+    _throwIfNotInitialized();
+    final method = await _channel.invokeMethod('loginWithToken', token);
+    return SumupPluginResponse.fromMap(method);
+  }
+
   /// Returns whether merchant is already logged in.
   static Future<bool?> get isLoggedIn async {
     _throwIfNotInitialized();
