@@ -28,6 +28,12 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
                 pluginResponse.message = ["result": reason]
                 result(pluginResponse.toDictionary())
             }
+        case "loginWithToken":
+            self.loginWithToken(token: call.arguments as! String) { success, reason in
+                pluginResponse.status = success
+                pluginResponse.message = ["result": reason]
+                result(pluginResponse.toDictionary())
+            }
         case "isLoggedIn":
             let isLoggedIn = self.isLoggedIn()
             pluginResponse.message = ["result": isLoggedIn]
@@ -144,7 +150,23 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
             }
         }
     }
-    
+
+    private func loginWithToken(token: String, completion: @escaping ((Bool, String) -> Void)) {
+        guard !self.isLoggedIn() else {
+            completion(false, "Already logged in")
+            return
+        }
+        
+        SumUpSDK.login(withToken: token)
+        { loggedIn, err in
+            if !loggedIn {
+                completion(loggedIn, err != nil ? err.debugDescription : "Login dialog closed")
+            } else {
+                completion(loggedIn, "Login successful")
+            }
+        }
+    }
+
     private func isLoggedIn() -> Bool {
         return SumUpSDK.isLoggedIn
     }
