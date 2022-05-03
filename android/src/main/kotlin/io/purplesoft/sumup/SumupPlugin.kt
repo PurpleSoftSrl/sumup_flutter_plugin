@@ -77,6 +77,7 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
         when (call.method) {
             "initSDK" -> initSDK(call.arguments as String).flutterResult()
             "login" -> login()
+            "loginWithToken" -> loginWithToken(call.arguments as String)
             "isLoggedIn" -> isLoggedIn().flutterResult()
             "getMerchant" -> getMerchant().flutterResult()
             "openSettings" -> openSettings()
@@ -104,6 +105,11 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
 
     private fun login() {
         val sumupLogin = SumUpLogin.builder(affiliateKey).build()
+        SumUpAPI.openLoginActivity(activity, sumupLogin, SumUpTask.LOGIN.code)
+    }
+
+    private fun loginWithToken(@NonNull token: String) {
+        val sumupLogin = SumUpLogin.builder(affiliateKey).accessToken(token).build()
         SumUpAPI.openLoginActivity(activity, sumupLogin, SumUpTask.LOGIN.code)
     }
 
