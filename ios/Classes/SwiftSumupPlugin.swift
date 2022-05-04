@@ -160,7 +160,7 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
         SumUpSDK.login(withToken: token)
         { loggedIn, err in
             if !loggedIn {
-                completion(loggedIn, err != nil ? err.debugDescription : "Login dialog closed")
+                completion(loggedIn, err != nil ? err.debugDescription : "Token login failed")
             } else {
                 completion(loggedIn, "Login successful")
             }
