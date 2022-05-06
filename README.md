@@ -44,6 +44,12 @@ Login:
 Sumup.login();
 ```
 
+Or login with token:
+
+```dart
+Sumup.loginWithToken(token);
+```
+
 Choose your preferred terminal:
 
 ```dart

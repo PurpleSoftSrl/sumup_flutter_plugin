@@ -1,3 +1,7 @@
+## 0.5.0
+
+* Add login with token (thanks to @davidhole)
+
 ## 0.4.0
 
 * iOS: add wakeUpTerminal
