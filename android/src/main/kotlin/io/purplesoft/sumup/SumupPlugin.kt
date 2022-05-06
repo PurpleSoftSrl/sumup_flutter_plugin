@@ -27,7 +27,7 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
     private val TAG = "SumupPlugin"
 
     private var operations: MutableMap<String, SumUpPluginResponseWrapper> = mutableMapOf()
-    private lateinit var currentOperation: SumUpPluginResponseWrapper
+    private var currentOperation: SumUpPluginResponseWrapper? = null
 
     private lateinit var affiliateKey: String
     private lateinit var channel: MethodChannel
@@ -110,7 +110,7 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
 
     private fun loginWithToken(@NonNull token: String) {
         val sumupLogin = SumUpLogin.builder(affiliateKey).accessToken(token).build()
-        SumUpAPI.openLoginActivity(activity, sumupLogin, SumUpTask.LOGIN.code)
+        SumUpAPI.openLoginActivity(activity, sumupLogin, SumUpTask.TOKEN_LOGIN.code)
     }
 
     private fun isLoggedIn(): SumUpPluginResponseWrapper {
@@ -203,12 +203,15 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
 
         if (resultCode !in resultCodes) return false
 
-        val currentOp: SumUpPluginResponseWrapper = when (SumUpTask.valueOf(requestCode)) {
-            SumUpTask.LOGIN -> operations["login"]!!
-            SumUpTask.CHECKOUT -> operations["checkout"]!!
-            SumUpTask.SETTINGS -> operations["openSettings"]!!
+        val currentOp: SumUpPluginResponseWrapper? = when (SumUpTask.valueOf(requestCode)) {
+            SumUpTask.LOGIN -> operations["login"]
+            SumUpTask.TOKEN_LOGIN -> operations["loginWithToken"]
+            SumUpTask.CHECKOUT -> operations["checkout"]
+            SumUpTask.SETTINGS -> operations["openSettings"]
             else -> currentOperation
         }
+
+        if (currentOp == null) return false
 
         if (data != null && data.extras != null) {
             val extra: Bundle = data.extras!!
@@ -219,6 +222,10 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
 
             when (SumUpTask.valueOf(requestCode)) {
                 SumUpTask.LOGIN -> {
+                    currentOp.response.message = mutableMapOf("loginResult" to resultCodeBoolean, "responseCode" to resultCodeInt, "responseMessage" to resultMessage, "requestCode" to requestCode)
+                    currentOp.flutterResult()
+                }
+                SumUpTask.TOKEN_LOGIN -> {
                     currentOp.response.message = mutableMapOf("loginResult" to resultCodeBoolean, "responseCode" to resultCodeInt, "responseMessage" to resultMessage, "requestCode" to requestCode)
                     currentOp.flutterResult()
                 }
@@ -257,6 +264,10 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
             currentOp.response.message = mutableMapOf("responseCode" to resultCode, "requestCode" to requestCode)
             currentOp.response.status = false
             currentOp.flutterResult()
+        } else if (SumUpTask.valueOf(requestCode) == SumUpTask.TOKEN_LOGIN) {
+            currentOp.response.message = mutableMapOf("responseCode" to resultCode, "requestCode" to requestCode)
+            currentOp.response.status = false
+            currentOp.flutterResult()
         } else {
             currentOp.response.message = mutableMapOf("errors" to "Intent Data and/or Extras are null or empty")
             currentOp.response.status = false
@@ -284,7 +295,7 @@ class SumupPluginResponse(@NonNull var methodName: String) {
 }
 
 enum class SumUpTask(val code: Int) {
-    LOGIN(1), CHECKOUT(2), SETTINGS(3);
+    LOGIN(1), CHECKOUT(2), SETTINGS(3), TOKEN_LOGIN(4);
 
     companion object {
         fun valueOf(value: Int) = values().find { it.code == value }
