@@ -35,6 +35,13 @@ class MyApp extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () async {
+                  var login = await Sumup.loginWithToken('your-token');
+                  print(login);
+                },
+                child: Text('Login with token'),
+              ),
+              TextButton(
+                onPressed: () async {
                   var settings = await Sumup.openSettings();
                   print(settings);
                 },
