@@ -2,8 +2,8 @@ PODS:
   - Flutter (1.0.0)
   - sumup (0.5.0):
     - Flutter
-    - SumUpSDK (= 4.2.0)
-  - SumUpSDK (4.2.0)
+    - SumUpSDK (= 4.2.1)
+  - SumUpSDK (4.2.1)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
