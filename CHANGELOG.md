@@ -1,3 +1,7 @@
+## 0.5.1
+
+* iOS: upgrade native SDK
+
 ## 0.5.0
 
 * Add login with token (thanks to @davidhole)
