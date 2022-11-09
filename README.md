@@ -1,6 +1,6 @@
 # sumup
 
-[![pub package](https://img.shields.io/pub/v/sumup.svg)](https://pub.dev/packages/sumup) [![likes](https://badges.bar/sumup/likes)](https://pub.dev/packages/sumup/score) [![popularity](https://badges.bar/sumup/popularity)](https://pub.dev/packages/sumup/score)  [![pub points](https://badges.bar/sumup/pub%20points)](https://pub.dev/packages/sumup/score)
+[![pub package](https://img.shields.io/pub/v/sumup.svg)](https://pub.dev/packages/sumup) [![likes](https://img.shields.io/pub/likes/sumup?logo=dart)](https://pub.dev/packages/sumup/score) [![popularity](https://img.shields.io/pub/popularity/sumup?logo=dart)](https://pub.dev/packages/sumup/score)  [![pub points](https://img.shields.io/pub/points/sumup?logo=dart)](https://pub.dev/packages/sumup/score)
 
 A Flutter wrapper to use the SumUp SDK.
 
