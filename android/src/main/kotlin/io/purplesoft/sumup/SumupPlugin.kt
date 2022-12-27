@@ -24,7 +24,7 @@ import io.flutter.plugin.common.PluginRegistry
 
 /** SumupPlugin */
 class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegistry.ActivityResultListener {
-    private val TAG = "SumupPlugin"
+    private val tag = "SumupPlugin"
 
     private var operations: MutableMap<String, SumUpPluginResponseWrapper> = mutableMapOf()
     private var currentOperation: SumUpPluginResponseWrapper? = null
@@ -34,38 +34,38 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
     private lateinit var activity: Activity
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        Log.d(TAG, "onAttachedToEngine")
+        Log.d(tag, "onAttachedToEngine")
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "sumup")
         channel.setMethodCallHandler(this)
     }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
-        Log.d(TAG, "onDetachedFromEngine")
+        Log.d(tag, "onDetachedFromEngine")
         channel.setMethodCallHandler(null)
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-        Log.d(TAG, "onAttachedToActivity")
+        Log.d(tag, "onAttachedToActivity")
         activity = binding.activity
         binding.addActivityResultListener(this)
     }
 
     override fun onDetachedFromActivityForConfigChanges() {
-        Log.d(TAG, "onDetachedFromActivityForConfigChanges")
+        Log.d(tag, "onDetachedFromActivityForConfigChanges")
     }
 
     override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-        Log.d(TAG, "onReattachedToActivityForConfigChanges")
+        Log.d(tag, "onReattachedToActivityForConfigChanges")
     }
 
     override fun onDetachedFromActivity() {
-        Log.d(TAG, "onDetachedFromActivity")
+        Log.d(tag, "onDetachedFromActivity")
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
-        Log.d(TAG, "onMethodCall: ${call.method}")
+        Log.d(tag, "onMethodCall: ${call.method}")
         if (!operations.containsKey(call.method)) {
-            operations[call.method] = SumUpPluginResponseWrapper(call.method, result)
+            operations[call.method] = SumUpPluginResponseWrapper(result)
         }
 
         val sumUpPluginResponseWrapper = operations[call.method]!!
@@ -139,8 +139,9 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
     private fun openSettings() {
         SumUpAPI.openCardReaderPage(activity, 3)
     }
+
     private fun wakeUpTerminal(): SumUpPluginResponseWrapper {
-        Log.d(TAG, "wakeUpTerminal")
+        Log.d(tag, "wakeUpTerminal")
         SumUpAPI.prepareForCheckout()
 
         val currentOp = operations["wakeUpTerminal"]!!
@@ -149,8 +150,9 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
 
         return currentOp
     }
+
     private fun checkout(@NonNull args: Map<String, Any?>, @Nullable info: Map<String, String>?) {
-        Log.d(TAG, "checkout")
+        Log.d(tag, "checkout")
         val payment = builder() // mandatory parameters
                 .total((args["total"] as Double).toBigDecimal()) // minimum 1.00
                 .title(args["title"] as String?)
@@ -177,7 +179,7 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
     }
 
     private fun isCheckoutInProgress(): SumUpPluginResponseWrapper {
-        Log.d(TAG, "isCheckoutInProgress")
+        Log.d(tag, "isCheckoutInProgress")
         val currentOp = operations["isCheckoutInProgress"]!!
         currentOp.response.message = mutableMapOf("exception" to "isCheckoutInProgress method is not implemented in android")
         currentOp.response.status = false
@@ -185,7 +187,7 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
     }
 
     private fun logout(): SumUpPluginResponseWrapper {
-        Log.d(TAG, "logout")
+        Log.d(tag, "logout")
         SumUpAPI.logout()
         val loggedIn = SumUpAPI.isLoggedIn()
 
@@ -197,21 +199,18 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-        Log.d(TAG, "onActivityResult - RequestCode: $requestCode - Result Code: $resultCode")
-        
+        Log.d(tag, "onActivityResult - RequestCode: $requestCode - Result Code: $resultCode")
         val resultCodes = intArrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
 
         if (resultCode !in resultCodes) return false
 
-        val currentOp: SumUpPluginResponseWrapper? = when (SumUpTask.valueOf(requestCode)) {
+        val currentOp: SumUpPluginResponseWrapper = when (SumUpTask.valueOf(requestCode)) {
             SumUpTask.LOGIN -> operations["login"]
             SumUpTask.TOKEN_LOGIN -> operations["loginWithToken"]
             SumUpTask.CHECKOUT -> operations["checkout"]
             SumUpTask.SETTINGS -> operations["openSettings"]
             else -> currentOperation
-        }
-
-        if (currentOp == null) return false
+        } ?: return false
 
         if (data != null && data.extras != null) {
             val extra: Bundle = data.extras!!
@@ -253,7 +252,6 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
                     //IN THEORY THIS CASE NEVER HAPPEN
                     currentOp.response.message = mutableMapOf("responseCode" to resultCodeInt, "responseMessage" to resultMessage, "errors" to "Unknown SumUp Task", "requestCode" to requestCode)
                     currentOp.flutterResult()
-
                 }
             }
           } else if (SumUpTask.valueOf(requestCode) == SumUpTask.SETTINGS) {
@@ -271,15 +269,13 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
         } else {
             currentOp.response.message = mutableMapOf("errors" to "Intent Data and/or Extras are null or empty")
             currentOp.response.status = false
-            //currentOp.flutterResult()
         }
+
         return currentOp.response.status
     }
-
 }
 
-
-class SumUpPluginResponseWrapper(@NonNull var methodName: String, @NonNull var methodResult: Result) {
+class SumUpPluginResponseWrapper(@NonNull var methodResult: Result) {
     lateinit var response: SumupPluginResponse
     fun flutterResult() {
         methodResult.success(response.toMap())
@@ -329,6 +325,3 @@ fun TransactionInfo.toMap(): Map<String, Any?> {
 fun TransactionInfo.Card.toMap(): Map<String, Any?> {
     return mapOf("last4Digits" to last4Digits, "type" to type)
 }
-
-
-
