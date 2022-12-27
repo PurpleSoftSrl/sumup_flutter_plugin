@@ -137,7 +137,7 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
     }
 
     private fun openSettings() {
-        SumUpAPI.openPaymentSettingsActivity(activity, 3)
+        SumUpAPI.openCardReaderPage(activity, 3)
     }
     private fun wakeUpTerminal(): SumUpPluginResponseWrapper {
         Log.d(TAG, "wakeUpTerminal")
