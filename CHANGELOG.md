@@ -1,3 +1,10 @@
+## 0.6.0
+
+* iOS: upgrade native SDK
+* Android: upgrade native SDK
+* Android: compileSdkVersion and targetSdkVersion 33
+* Android: code cleaning
+
 ## 0.5.1
 
 * iOS: upgrade native SDK
