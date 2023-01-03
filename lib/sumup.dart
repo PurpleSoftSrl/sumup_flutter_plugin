@@ -101,6 +101,21 @@ class Sumup {
     return SumupPluginResponse.fromMap(method);
   }
 
+  /// To prepare a SumUp card terminal for checkout, a registered SumUp merchant
+  /// account needs to be logged in and the card terminal will have been already
+  /// setup. Calling prepareForCheckout() before instancing a checkout will
+  /// speed up the checkout time.
+  ///
+  /// Login required.
+  static Future<SumupPluginResponse> prepareForCheckout(
+      [bool? retainBLEConnection]) async {
+    _throwIfNotInitialized();
+    await _throwIfNotLoggedIn();
+    final method =
+        await _channel.invokeMethod('prepareForCheckout', retainBLEConnection);
+    return SumupPluginResponse.fromMap(method);
+  }
+
   /// Starts a checkout process with [paymentRequest].
   ///
   /// Login required.
