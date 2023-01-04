@@ -217,6 +217,10 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
     private func wakeUpTerminal() {
         SumUpSDK.prepareForCheckout()
     }
+
+    private func prepareForCheckout() {
+        SumUpSDK.prepareForCheckout()
+    }
     
     private func checkout(request: CheckoutRequest, completion: @escaping ((CheckoutResult) -> Void)) {
         SumUpSDK.checkout(with: request, from: topController())
