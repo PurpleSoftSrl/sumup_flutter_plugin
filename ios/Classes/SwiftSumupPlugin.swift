@@ -57,6 +57,12 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
             pluginResponse.status = true
             pluginResponse.message = ["result": "ok"]
             result(pluginResponse.toDictionary())
+
+        case "prepareForCheckout":
+            self.prepareForCheckout()
+            pluginResponse.status = true
+            pluginResponse.message = ["result": "ok"]
+            result(pluginResponse.toDictionary())
             
         case "checkout":
             let args = call.arguments as! [String: Any]
