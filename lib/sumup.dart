@@ -107,7 +107,7 @@ class Sumup {
   /// Don't call this method during checkout because it can lead to checkout failure.
   /// Login required.
   static Future<SumupPluginResponse> prepareForCheckout(
-      {bool? retainBLEConnection = false}) async {
+      {bool retainBLEConnection = false}) async {
     _throwIfNotInitialized();
     await _throwIfNotLoggedIn();
     final method =

@@ -153,7 +153,7 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
         return currentOp
     }
 
-    private fun prepareForCheckout(retainBLEConnection: Boolean? = null): SumUpPluginResponseWrapper {
+    private fun prepareForCheckout(@NonNull retainBLEConnection: Boolean): SumUpPluginResponseWrapper {
         Log.d(tag, "prepareForCheckout")
         Log.d(tag, retainBLEConnection.toString())
         SumUpExperimentalAPI.prepareForCheckout(retainBLEConnection ?: true)
