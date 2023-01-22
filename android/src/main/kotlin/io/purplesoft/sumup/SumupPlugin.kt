@@ -83,7 +83,7 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
             "getMerchant" -> getMerchant().flutterResult()
             "openSettings" -> openSettings()
             "wakeUpTerminal" -> wakeUpTerminal().flutterResult()
-            "prepareForCheckout" -> prepareForCheckout(call.arguments as Boolean?).flutterResult()
+            "prepareForCheckout" -> prepareForCheckout(call.arguments as Boolean).flutterResult()
             "checkout" -> checkout(call.argument<Map<String, String>>("payment")!!, call.argument<Map<String, String>>("info"))
             "isCheckoutInProgress" -> isCheckoutInProgress().flutterResult()
             "isTipOnCardReaderAvailable" -> isTipOnCardReaderAvailable().flutterResult()
