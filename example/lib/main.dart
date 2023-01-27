@@ -56,6 +56,14 @@ class MyApp extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () async {
+                  var prepare =
+                      await Sumup.prepareForCheckout(retainBLEConnection: true);
+                  print(prepare);
+                },
+                child: Text('Prepare for checkout'),
+              ),
+              TextButton(
+                onPressed: () async {
                   var payment = SumupPayment(
                     title: 'Test payment',
                     total: 1.2,

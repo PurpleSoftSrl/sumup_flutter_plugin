@@ -103,6 +103,7 @@ class Sumup {
   ///
   /// Don't call this method during checkout because it can lead to checkout failure.
   /// Login required.
+  @Deprecated('Use prepareForCheckout(retainBLEConnection) instead')
   static Future<SumupPluginResponse> wakeUpTerminal() async {
     _throwIfNotInitialized();
     await _throwIfNotLoggedIn();
