@@ -155,9 +155,8 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
     }
 
     private fun prepareForCheckout(@NonNull retainBLEConnection: Boolean): SumUpPluginResponseWrapper {
-        Log.d(tag, "prepareForCheckout")
-        Log.d(tag, retainBLEConnection.toString())
-        SumUpExperimentalAPI.prepareForCheckout(retainBLEConnection ?: true)
+        Log.d(tag, "prepareForCheckout - retainBLEConnection: $retainBLEConnection")
+        SumUpExperimentalAPI.prepareForCheckout(retainBLEConnection)
 
         val currentOp = operations["prepareForCheckout"]!!
         currentOp.response.message = mutableMapOf("prepareForCheckout" to true)
