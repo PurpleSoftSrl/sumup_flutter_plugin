@@ -1,6 +1,6 @@
 PODS:
   - Flutter (1.0.0)
-  - sumup (0.6.0):
+  - sumup (0.6.1):
     - Flutter
     - SumUpSDK (= 4.3.1)
   - SumUpSDK (4.3.1)

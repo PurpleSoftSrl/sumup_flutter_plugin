@@ -36,8 +36,17 @@ class Sumup {
 
   /// Initializes SumUp SDK with your [affiliateKey].
   ///
-  /// Must be called before anything else
+  /// Must be called only once before anything else. Calling this again has no effect since
+  /// the SDK has already been initialized.
   static Future<SumupPluginResponse> init(String affiliateKey) async {
+    if (_isInitialized) {
+      return SumupPluginResponse.fromMap({
+        'methodName': 'initSDK',
+        'status': true,
+        'message': {'initialized': true}
+      });
+    }
+
     final method = await _channel.invokeMethod('initSDK', affiliateKey);
     final response = SumupPluginResponse.fromMap(method);
     if (response.status) {

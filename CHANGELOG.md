@@ -1,3 +1,7 @@
+## 0.6.1
+
+* Android: fix checkout hang when initializing SDK multiple times
+
 ## 0.6.0
 
 * iOS: upgrade native SDK
