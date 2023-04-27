@@ -66,6 +66,13 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
             
             request.foreignTransactionID = payment["foreignTransactionId"] as? String
             request.tipAmount = NSDecimalNumber(floatLiteral: payment["tip"] as! Double)
+            
+            let tipOnCardReader = payment["tipOnCardReader"] as! Bool
+            if (tipOnCardReader && isTipOnCardReaderAvailable())
+            {
+                request.tipOnCardReaderIfAvailable = tipOnCardReader
+            }
+            
             request.saleItemsCount = payment["saleItemsCount"] as! UInt
             
             if payment["skipSuccessScreen"] as! Bool {

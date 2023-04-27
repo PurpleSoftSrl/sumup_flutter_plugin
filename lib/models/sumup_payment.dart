@@ -5,19 +5,24 @@ class SumupPayment {
     required this.total,
     this.currency = 'EUR',
     this.tip = .0,
+    this.tipOnCardReader = false,
     this.skipSuccessScreen = false,
     this.skipFailureScreen = false,
     this.foreignTransactionId,
     this.saleItemsCount = 0,
     this.customerEmail,
     this.customerPhone,
-  });
+  }) : assert(!tipOnCardReader || tip == 0,
+            'If [tipOnCardReader] is true, [tip] must be zero. The two options are mutually exclusive.');
 
   /// Total payment amount.
   double total;
 
-  /// Optional tip, defaults to 0.
+  /// Optional tip, defaults to 0. If tip is grater than 0, [tipOnCardReader] must be false.
   double tip;
+
+  /// Shows tip on card reader if card reader supports it. If tipOnCardReader is true, [tip] must be 0.
+  bool tipOnCardReader;
 
   /// Optional payment title, will be visible on merchant transaction history.
   String? title;
@@ -52,6 +57,7 @@ class SumupPayment {
         'title': title,
         'currency': currency,
         'tip': tip,
+        'tipOnCardReader': tipOnCardReader,
         'skipSuccessScreen': skipSuccessScreen,
         'skipFailureScreen': skipFailureScreen,
         'foreignTransactionId': foreignTransactionId,

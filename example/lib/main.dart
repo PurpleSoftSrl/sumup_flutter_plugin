@@ -64,7 +64,7 @@ class MyApp extends StatelessWidget {
                     saleItemsCount: 0,
                     skipSuccessScreen: false,
                     skipFailureScreen: true,
-                    tip: .5,
+                    tipOnCardReader: true,
                     customerEmail: null,
                     customerPhone: null,
                   );

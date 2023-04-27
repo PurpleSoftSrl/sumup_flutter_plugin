@@ -127,6 +127,11 @@ class Sumup {
       SumupPaymentRequest paymentRequest) async {
     _throwIfNotInitialized();
     await _throwIfNotLoggedIn();
+
+    if (paymentRequest.payment.tipOnCardReader && paymentRequest.payment.tip > 0) {
+      throw Exception('Cannot perform checkout with [tip] greater than 0 and [tipOnCardReader] true');
+    }
+
     final request = paymentRequest.toMap();
     final method = await _channel.invokeMethod('checkout', request);
     final response = SumupPluginResponse.fromMap(method);

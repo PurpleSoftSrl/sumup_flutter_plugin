@@ -160,7 +160,13 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
                 .currency(SumUpPayment.Currency.valueOf(args["currency"] as String))
 
         if (args["tip"] != null) payment.tip((args["tip"] as Double).toBigDecimal())
-        
+        if (args["tipOnCardReader"] != null && args["tipOnCardReader"] as Boolean) {
+            val isTcrAvailable = isTipOnCardReaderAvailable().response.status
+            if (isTcrAvailable) {
+                payment.tipOnCardReader()
+            }
+        }
+
         if (args["customerEmail"] != null) payment.receiptEmail(args["customerEmail"] as String)
         if (args["customerPhone"] != null) payment.receiptSMS(args["customerPhone"] as String)
 
@@ -192,7 +198,7 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
 
         val isAvailable = SumUpAPI.isTipOnCardReaderAvailable()
         
-        val currentOp = operations["isTipOnCardReaderAvailable"]!!
+        val currentOp = operations["isTipOnCardReaderAvailable"] ?: currentOperation!!
         currentOp.response.message = mutableMapOf("isAvailable" to isAvailable)
         currentOp.response.status = isAvailable
         return currentOp
