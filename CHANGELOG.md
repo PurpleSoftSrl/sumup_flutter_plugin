@@ -1,3 +1,9 @@
+## 0.7.0
+
+* Upgrade native SDKs
+* Add isTipOnCardReaderAvailable getter
+* Add tipOnCardReader in SumupPayment
+
 ## 0.6.1
 
 * Android: fix checkout hang when initializing SDK multiple times
