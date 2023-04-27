@@ -84,6 +84,7 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
             "wakeUpTerminal" -> wakeUpTerminal().flutterResult()
             "checkout" -> checkout(call.argument<Map<String, String>>("payment")!!, call.argument<Map<String, String>>("info"))
             "isCheckoutInProgress" -> isCheckoutInProgress().flutterResult()
+            "isTipOnCardReaderAvailable" -> isTipOnCardReaderAvailable().flutterResult()
             "logout" -> logout().flutterResult()
             else -> result.notImplemented()
         }
@@ -183,6 +184,17 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
         val currentOp = operations["isCheckoutInProgress"]!!
         currentOp.response.message = mutableMapOf("exception" to "isCheckoutInProgress method is not implemented in android")
         currentOp.response.status = false
+        return currentOp
+    }
+
+    private fun isTipOnCardReaderAvailable(): SumUpPluginResponseWrapper {
+        Log.d(tag, "isTipOnCardReaderAvailable")
+
+        val isAvailable = SumUpAPI.isTipOnCardReaderAvailable()
+        
+        val currentOp = operations["isTipOnCardReaderAvailable"]!!
+        currentOp.response.message = mutableMapOf("isAvailable" to isAvailable)
+        currentOp.response.status = isAvailable
         return currentOp
     }
 

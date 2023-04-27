@@ -109,6 +109,16 @@ class Sumup {
     final method = await _channel.invokeMethod('wakeUpTerminal');
     return SumupPluginResponse.fromMap(method);
   }
+  
+  /// Checks if Tip on Card Reader (TCR) feature is available.
+  ///
+  /// Login required.
+  static Future<bool> get isTipOnCardReaderAvailable async {
+    _throwIfNotInitialized();
+    await _throwIfNotLoggedIn();
+    final method = await _channel.invokeMethod('isTipOnCardReaderAvailable');
+    return SumupPluginResponse.fromMap(method).status;
+  }
 
   /// Starts a checkout process with [paymentRequest].
   ///

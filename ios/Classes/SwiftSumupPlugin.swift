@@ -115,6 +115,12 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
             pluginResponse.message = ["result": isInProgress]
             pluginResponse.status = isInProgress
             result(pluginResponse.toDictionary())
+        
+        case "isTipOnCardReaderAvailable":
+            let isAvailable = self.isTipOnCardReaderAvailable()
+            pluginResponse.message = ["result": isAvailable]
+            pluginResponse.status = isAvailable
+            result(pluginResponse.toDictionary())
             
         case "logout":
             self.logout(completion: {
@@ -218,6 +224,10 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
     
     private func isCheckoutInProgress() -> Bool {
         return SumUpSDK.checkoutInProgress
+    }
+    
+    private func isTipOnCardReaderAvailable() -> Bool {
+        return SumUpSDK.isTipOnCardReaderAvailable
     }
     
     private func logout(completion: @escaping ((Bool) -> Void)) {

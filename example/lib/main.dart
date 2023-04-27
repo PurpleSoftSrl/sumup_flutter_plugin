@@ -64,7 +64,7 @@ class MyApp extends StatelessWidget {
                     saleItemsCount: 0,
                     skipSuccessScreen: false,
                     skipFailureScreen: true,
-                    tip: .0,
+                    tip: .5,
                     customerEmail: null,
                     customerPhone: null,
                   );
@@ -88,6 +88,13 @@ class MyApp extends StatelessWidget {
                   print(isInProgress);
                 },
                 child: Text('Is checkout in progress'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  var isTcrAvailable = await Sumup.isTipOnCardReaderAvailable;
+                  print(isTcrAvailable);
+                },
+                child: Text('Is TCR available'),
               ),
               TextButton(
                 onPressed: () async {
