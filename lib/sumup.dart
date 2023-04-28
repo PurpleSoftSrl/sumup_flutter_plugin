@@ -109,7 +109,7 @@ class Sumup {
     final method = await _channel.invokeMethod('wakeUpTerminal');
     return SumupPluginResponse.fromMap(method);
   }
-  
+
   /// Checks if Tip on Card Reader (TCR) feature is available.
   ///
   /// Login required.
@@ -128,8 +128,10 @@ class Sumup {
     _throwIfNotInitialized();
     await _throwIfNotLoggedIn();
 
-    if (paymentRequest.payment.tipOnCardReader && paymentRequest.payment.tip > 0) {
-      throw Exception('Cannot perform checkout with [tip] greater than 0 and [tipOnCardReader] true');
+    if (paymentRequest.payment.tipOnCardReader &&
+        paymentRequest.payment.tip > 0) {
+      throw Exception(
+          'Cannot perform checkout with [tip] greater than 0 and [tipOnCardReader] true');
     }
 
     final request = paymentRequest.toMap();
