@@ -7,7 +7,6 @@ import android.util.Log
 import androidx.annotation.NonNull
 import androidx.annotation.Nullable
 import com.sumup.merchant.reader.api.SumUpAPI
-import com.sumup.merchant.reader.api.SumUpExperimentalAPI
 import com.sumup.merchant.reader.api.SumUpLogin
 import com.sumup.merchant.reader.api.SumUpPayment
 import com.sumup.merchant.reader.api.SumUpPayment.builder
