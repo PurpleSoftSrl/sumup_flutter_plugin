@@ -49,10 +49,10 @@ class MyApp extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () async {
-                  var prepare = await Sumup.wakeUpTerminal();
+                  var prepare = await Sumup.prepareForCheckout();
                   print(prepare);
                 },
-                child: Text('Wake up terminal'),
+                child: Text('Prepare for checkout'),
               ),
               TextButton(
                 onPressed: () async {

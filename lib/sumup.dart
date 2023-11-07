@@ -103,10 +103,20 @@ class Sumup {
   ///
   /// Don't call this method during checkout because it can lead to checkout failure.
   /// Login required.
+  @Deprecated('Use prepareForCheckout() instead')
   static Future<SumupPluginResponse> wakeUpTerminal() async {
+    return prepareForCheckout();
+  }
+
+  /// Calling prepareForCheckout() before instancing a checkout will
+  /// speed up the checkout time.
+  ///
+  /// Don't call this method during checkout because it can lead to checkout failure.
+  /// Login required.
+  static Future<SumupPluginResponse> prepareForCheckout() async {
     _throwIfNotInitialized();
     await _throwIfNotLoggedIn();
-    final method = await _channel.invokeMethod('wakeUpTerminal');
+    final method = await _channel.invokeMethod('prepareForCheckout');
     return SumupPluginResponse.fromMap(method);
   }
 
