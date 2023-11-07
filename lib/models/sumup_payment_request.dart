@@ -4,8 +4,9 @@ import 'sumup_payment.dart';
 class SumupPaymentRequest {
   SumupPaymentRequest(
     this.payment, {
-    @Deprecated('This field is not used anymore. See issue https://github.com/sumup/sumup-android-sdk/issues/166')
-        this.info,
+    @Deprecated(
+        'This field is not used anymore. See issue https://github.com/sumup/sumup-android-sdk/issues/166')
+    this.info,
   });
 
   SumupPayment payment;
