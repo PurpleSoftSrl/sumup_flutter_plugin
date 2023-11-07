@@ -49,15 +49,7 @@ class MyApp extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () async {
-                  var prepare = await Sumup.wakeUpTerminal();
-                  print(prepare);
-                },
-                child: Text('Wake up terminal'),
-              ),
-              TextButton(
-                onPressed: () async {
-                  var prepare =
-                      await Sumup.prepareForCheckout(retainBLEConnection: true);
+                  var prepare = await Sumup.prepareForCheckout();
                   print(prepare);
                 },
                 child: Text('Prepare for checkout'),

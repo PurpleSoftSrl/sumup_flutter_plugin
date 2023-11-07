@@ -82,8 +82,7 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
             "isLoggedIn" -> isLoggedIn().flutterResult()
             "getMerchant" -> getMerchant().flutterResult()
             "openSettings" -> openSettings()
-            "wakeUpTerminal" -> wakeUpTerminal().flutterResult()
-            "prepareForCheckout" -> prepareForCheckout(call.arguments as Boolean).flutterResult()
+            "prepareForCheckout" -> prepareForCheckout().flutterResult()
             "checkout" -> checkout(call.argument<Map<String, String>>("payment")!!, call.argument<Map<String, String>>("info"))
             "isCheckoutInProgress" -> isCheckoutInProgress().flutterResult()
             "isTipOnCardReaderAvailable" -> isTipOnCardReaderAvailable().flutterResult()
@@ -143,20 +142,9 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
         SumUpAPI.openCardReaderPage(activity, 3)
     }
 
-    private fun wakeUpTerminal(): SumUpPluginResponseWrapper {
-        Log.d(tag, "wakeUpTerminal")
-        SumUpExperimentalAPI.prepareForCheckout(true)
-
-        val currentOp = operations["wakeUpTerminal"]!!
-        currentOp.response.message = mutableMapOf("wakeUp" to true)
-        currentOp.response.status = true
-
-        return currentOp
-    }
-
-    private fun prepareForCheckout(@NonNull retainBLEConnection: Boolean): SumUpPluginResponseWrapper {
-        Log.d(tag, "prepareForCheckout - retainBLEConnection: $retainBLEConnection")
-        SumUpExperimentalAPI.prepareForCheckout(retainBLEConnection)
+    private fun prepareForCheckout(): SumUpPluginResponseWrapper {
+        Log.d(tag, "prepareForCheckout")
+        SumUpAPI.prepareForCheckout()
 
         val currentOp = operations["prepareForCheckout"]!!
         currentOp.response.message = mutableMapOf("prepareForCheckout" to true)

@@ -59,7 +59,7 @@ Sumup.openSettings();
 Prepare terminal for checkout:
 
 ```dart
-Sumup.wakeUpTerminal();
+Sumup.prepareForCheckout();
 ```
 
 Complete a transaction:
@@ -93,7 +93,7 @@ Sumup.merchant;
 
 Sumup.openSettings();
 
-Sumup.wakeUpTerminal();
+Sumup.prepareForCheckout();
 
 Sumup.checkout(request);
 
