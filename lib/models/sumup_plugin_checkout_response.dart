@@ -32,10 +32,9 @@ class SumupPluginCheckoutResponse {
     tipAmount = response['tipAmount'];
     paymentType = response['paymentType'];
     entryMode = response['entryMode'];
-    installments = response['installments'];
+    installments = int.tryParse(response['installments'].toString());
     cardType = response['cardType'];
     cardLastDigits = response['cardLastDigits'];
-    //products = response['products'];
 
     // some parameters are available only for Android
     if (Platform.isAndroid) {
