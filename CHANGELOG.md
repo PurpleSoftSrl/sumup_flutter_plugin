@@ -1,3 +1,9 @@
+## 0.9.0
+
+* iOS: upgrade native SDK
+* iOS: bump minimum OS version to 14.0
+* Upgrade dependencies
+
 ## 0.8.1
 
 * Handle `installments` field null
