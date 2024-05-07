@@ -2,8 +2,8 @@ PODS:
   - Flutter (1.0.0)
   - sumup (0.8.1):
     - Flutter
-    - SumUpSDK (= 4.3.4)
-  - SumUpSDK (4.3.4)
+    - SumUpSDK (= 5.0.0)
+  - SumUpSDK (5.0.0)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
@@ -20,10 +20,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/sumup/ios"
 
 SPEC CHECKSUMS:
-  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   sumup: 6e80212e214dfda780621388f6e1670cd0232709
-  SumUpSDK: 568e36b30f8f540c787f423482ea3b4db29f59cb
+  SumUpSDK: 960b306c09e3b0638d98f15d7804a336a740bdfc
 
-PODFILE CHECKSUM: 4e8f8b2be68aeea4c0d5beb6ff1e79fface1d048
+PODFILE CHECKSUM: 775997f741c536251164e3eacf6e34abf2eb7a17
 
-COCOAPODS: 1.14.3
+COCOAPODS: 1.15.2
