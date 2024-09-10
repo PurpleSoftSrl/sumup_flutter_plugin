@@ -26,6 +26,8 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
+    namespace 'io.purplesoft.sumup'
+
     compileSdk 33
     
     defaultConfig {
