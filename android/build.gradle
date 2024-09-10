@@ -29,6 +29,10 @@ android {
     namespace 'io.purplesoft.sumup'
 
     compileSdk 33
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
     
     defaultConfig {
         targetSdkVersion 33
