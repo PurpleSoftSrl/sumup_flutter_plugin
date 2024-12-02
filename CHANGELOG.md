@@ -1,3 +1,8 @@
+## 0.11.0
+
+* Android: upgrade native SDK
+* Upgrade dependencies
+
 ## 0.10.0
 
 * Upgrade native SDKs

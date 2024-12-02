@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'sumup'
-  s.version          = '0.10.0'
+  s.version          = '0.11.0'
   s.summary          = 'Flutter wrapper to use the Sumup SDK.'
   s.description      = <<-DESC
   Flutter wrapper to use the Sumup SDK. With this plugin, your app can easily connect to a Sumup terminal, login and accept card payments on Android and iOS.
