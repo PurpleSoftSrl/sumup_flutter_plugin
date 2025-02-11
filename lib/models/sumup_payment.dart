@@ -55,7 +55,7 @@ class SumupPayment {
   Map<String, dynamic> toMap() => {
         'total': total,
         'title': title,
-        'currency': currency,
+        'currency': currency.toUpperCase(),
         'tip': tip,
         'tipOnCardReader': tipOnCardReader,
         'skipSuccessScreen': skipSuccessScreen,
