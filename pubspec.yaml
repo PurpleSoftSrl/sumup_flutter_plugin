@@ -19,4 +19,4 @@ flutter:
         package: io.purplesoft.sumup
         pluginClass: SumupPlugin
       ios:
-        pluginClass: SumupPlugin
+        pluginClass: SwiftSumupPlugin

@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Purplesoft S.r.l' => 'developers@purplesoft.io' }
   s.source           = { :path => '.' }
-  s.source_files = 'Classes/**/*'
+  s.source_files = 'sumup/Sources/sumup'
   s.dependency 'Flutter'
   s.dependency 'SumUpSDK', '6.0.0'
   s.platform = :ios, '14.0'
