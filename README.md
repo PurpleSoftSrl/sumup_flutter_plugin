@@ -1,6 +1,6 @@
 # sumup
 
-[![pub package](https://img.shields.io/pub/v/sumup.svg)](https://pub.dev/packages/sumup) [![likes](https://img.shields.io/pub/likes/sumup?logo=dart)](https://pub.dev/packages/sumup/score) [![popularity](https://img.shields.io/pub/popularity/sumup?logo=dart)](https://pub.dev/packages/sumup/score)  [![pub points](https://img.shields.io/pub/points/sumup?logo=dart)](https://pub.dev/packages/sumup/score)
+[![pub package](https://img.shields.io/pub/v/sumup.svg)](https://pub.dev/packages/sumup) [![likes](https://img.shields.io/pub/likes/sumup?logo=dart)](https://pub.dev/packages/sumup/score) [![popularity](https://img.shields.io/pub/dm/sumup?logo=dart)](https://pub.dev/packages/sumup/score)  [![pub points](https://img.shields.io/pub/points/sumup?logo=dart)](https://pub.dev/packages/sumup/score)
 
 A Flutter wrapper to use the SumUp SDK.
 
@@ -10,10 +10,10 @@ login and accept card payments on Android and iOS.
 ## Prerequisites
 
 1) Registered for a merchant account via SumUp's [country websites](https://sumup.it/purplesoft) (or received a test account).
-2) Received SumUp card terminal: Air, Air Lite, PIN+ terminal, Chip & Signature reader, or SumUp Air Register.
+2) Received SumUp card terminal: Solo, Air, Air Lite, PIN+ terminal, Chip & Signature reader, or SumUp Air Register.
 3) Requested an Affiliate (Access) Key and registered your application ID via [SumUp Dashboard](https://me.sumup.com/developers) for Developers.
 4) Deployment Target iOS 14.0 or higher.
-5) Android minSdkVersion 23 or higher.
+5) Android minSdkVersion 26 or higher.
 
 ## Installing
 
