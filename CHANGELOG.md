@@ -1,3 +1,8 @@
+## 0.12.0
+
+* iOS: add support for Swift Package Manager
+* Upgrade dependencies
+
 ## 0.11.0
 
 * Android: upgrade native SDK
