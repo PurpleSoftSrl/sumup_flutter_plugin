@@ -1,3 +1,7 @@
+## 0.12.1
+
+* Android: fix missing proguard rules
+
 ## 0.12.0
 
 * iOS: add support for Swift Package Manager
