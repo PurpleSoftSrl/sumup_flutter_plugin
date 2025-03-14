@@ -36,6 +36,7 @@ android {
     
     defaultConfig {
         targetSdkVersion 33
+        consumerProguardFiles 'consumer-rules.pro'
     }
 
     sourceSets {
