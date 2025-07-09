@@ -85,6 +85,7 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
             "checkout" -> checkout(call.argument<Map<String, String>>("payment")!!, call.argument<Map<String, String>>("info"))
             "isCheckoutInProgress" -> isCheckoutInProgress().flutterResult()
             "isTipOnCardReaderAvailable" -> isTipOnCardReaderAvailable().flutterResult()
+            "isCardTypeRequired" -> isCardTypeRequired().flutterResult()
             "logout" -> logout().flutterResult()
             else -> result.notImplemented()
         }
@@ -201,6 +202,15 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
         val currentOp = operations["isTipOnCardReaderAvailable"] ?: currentOperation!!
         currentOp.response.message = mutableMapOf("isAvailable" to isAvailable)
         currentOp.response.status = isAvailable
+        return currentOp
+    }
+
+    private fun isCardTypeRequired(): SumUpPluginResponseWrapper {
+        Log.d(tag, "isCardTypeRequired")
+        val currentOp = operations["isCardTypeRequired"]!!
+        currentOp.response.message =
+            mutableMapOf("exception" to "isCardTypeRequired method is not implemented in android")
+        currentOp.response.status = false
         return currentOp
     }
 

@@ -67,6 +67,7 @@ class MyApp extends StatelessWidget {
                     tipOnCardReader: true,
                     customerEmail: null,
                     customerPhone: null,
+                    cardType: null,
                   );
 
                   var request = SumupPaymentRequest(payment);
@@ -95,6 +96,13 @@ class MyApp extends StatelessWidget {
                   print(isTcrAvailable);
                 },
                 child: Text('Is TCR available'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  var isCardTypeRequired = await Sumup.isCardTypeRequired;
+                  print(isCardTypeRequired);
+                },
+                child: Text('Is Card Type Required'),
               ),
               TextButton(
                 onPressed: () async {

@@ -129,6 +129,17 @@ class Sumup {
     final method = await _channel.invokeMethod('isTipOnCardReaderAvailable');
     return SumupPluginResponse.fromMap(method).status;
   }
+  
+  /// Checks if card type is required in checkout.
+  /// Only available for iOS, on Android always returns false.
+  ///
+  /// Login required.
+  static Future<bool> get isCardTypeRequired async {
+    _throwIfNotInitialized();
+    await _throwIfNotLoggedIn();
+    final method = await _channel.invokeMethod('isCardTypeRequired');
+    return SumupPluginResponse.fromMap(method).status;
+  }
 
   /// Starts a checkout process with [paymentRequest].
   ///
@@ -150,8 +161,7 @@ class Sumup {
     return SumupPluginCheckoutResponse.fromMap(response.message!);
   }
 
-  /// Only available for iOS.
-  /// On Android always returns false.
+  /// Only available for iOS, on Android always returns false.
   ///
   /// Login required.
   static Future<bool?> get isCheckoutInProgress async {

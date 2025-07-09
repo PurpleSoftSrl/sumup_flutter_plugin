@@ -12,6 +12,7 @@ class SumupPayment {
     this.saleItemsCount = 0,
     this.customerEmail,
     this.customerPhone,
+    this.cardType,
   }) : assert(!tipOnCardReader || tip == 0,
             'If [tipOnCardReader] is true, [tip] must be zero. The two options are mutually exclusive.');
 
@@ -52,6 +53,13 @@ class SumupPayment {
   /// Android only (see https://github.com/sumup/sumup-ios-sdk/issues/74)
   String? customerPhone;
 
+  /// Optional card type that in some country is required.
+  /// 
+  /// Call [Sumup.isCardTypeRequired] to check if card type is required in checkout.
+  ///
+  /// iOS only
+  CardType? cardType;
+
   Map<String, dynamic> toMap() => {
         'total': total,
         'title': title,
@@ -64,5 +72,11 @@ class SumupPayment {
         'saleItemsCount': saleItemsCount,
         'customerEmail': customerEmail,
         'customerPhone': customerPhone,
+        'cardType': cardType?.name,
       };
+}
+
+enum CardType {
+  debit,
+  credit,
 }

@@ -69,6 +69,11 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
             request.foreignTransactionID = payment["foreignTransactionId"] as? String
             request.tipAmount = NSDecimalNumber(floatLiteral: payment["tip"] as! Double)
             
+            let cardType = payment["cardType"] as? String
+            if cardType != nil {
+                request.processAs = cardType == "credit" ? ProcessAs.credit : ProcessAs.debit
+            }
+            
             let tipOnCardReader = payment["tipOnCardReader"] as! Bool
             if (tipOnCardReader && isTipOnCardReaderAvailable())
             {
@@ -129,6 +134,12 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
             let isAvailable = self.isTipOnCardReaderAvailable()
             pluginResponse.message = ["result": isAvailable]
             pluginResponse.status = isAvailable
+            result(pluginResponse.toDictionary())
+            
+        case "isCardTypeRequired":
+            let isRequired = self.isCardTypeRequired()
+            pluginResponse.message = ["result": isRequired]
+            pluginResponse.status = isRequired
             result(pluginResponse.toDictionary())
             
         case "logout":
@@ -237,6 +248,10 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
     
     private func isTipOnCardReaderAvailable() -> Bool {
         return SumUpSDK.isTipOnCardReaderAvailable
+    }
+    
+    private func isCardTypeRequired() -> Bool {
+        return SumUpSDK.isProcessAsRequired
     }
     
     private func logout(completion: @escaping ((Bool) -> Void)) {
