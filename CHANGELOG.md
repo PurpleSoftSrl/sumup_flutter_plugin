@@ -1,3 +1,9 @@
+## 0.13.0
+
+* iOS: upgrade native SDK
+* Add cardType checkout parameter and isCardTypeRequired getter (iOS only)
+* Upgrade dependencies
+
 ## 0.12.1
 
 * Android: fix missing proguard rules
