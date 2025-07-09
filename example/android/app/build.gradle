@@ -35,10 +35,6 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
-    lintOptions {
-        disable 'InvalidPackage'
-    }
-
     defaultConfig {
         applicationId "io.purplesoft.sumup_example"
         minSdkVersion 26
@@ -51,6 +47,10 @@ android {
         release {
             signingConfig signingConfigs.debug
         }
+    }
+
+    lint {
+        disable 'InvalidPackage'
     }
 }
 
