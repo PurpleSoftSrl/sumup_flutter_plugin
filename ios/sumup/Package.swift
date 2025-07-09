@@ -1,4 +1,4 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 5.10
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -6,13 +6,13 @@ import PackageDescription
 let package = Package(
     name: "sumup",
     platforms: [
-        .iOS("14.0")
+        .iOS(.v15)
     ],
     products: [
         .library(name: "sumup", targets: ["sumup"])
     ],
     dependencies: [
-        .package(url: "https://github.com/sumup/sumup-ios-sdk.git", from: "6.0.0"),
+        .package(url: "https://github.com/sumup/sumup-ios-sdk.git", from: "6.1.1"),
     ],
     targets: [
         .target(
