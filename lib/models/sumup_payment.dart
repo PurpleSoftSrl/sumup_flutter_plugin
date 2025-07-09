@@ -54,7 +54,7 @@ class SumupPayment {
   String? customerPhone;
 
   /// Optional card type that in some country is required.
-  /// 
+  ///
   /// Call [Sumup.isCardTypeRequired] to check if card type is required in checkout.
   ///
   /// iOS only

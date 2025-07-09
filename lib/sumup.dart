@@ -129,7 +129,7 @@ class Sumup {
     final method = await _channel.invokeMethod('isTipOnCardReaderAvailable');
     return SumupPluginResponse.fromMap(method).status;
   }
-  
+
   /// Checks if card type is required in checkout.
   /// Only available for iOS, on Android always returns false.
   ///
