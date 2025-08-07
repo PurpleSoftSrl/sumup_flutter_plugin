@@ -158,7 +158,7 @@ class Sumup {
     final request = paymentRequest.toMap();
     final method = await _channel.invokeMethod('checkout', request);
     final response = SumupPluginResponse.fromMap(method);
-    return SumupPluginCheckoutResponse.fromMap(response.message!);
+    return SumupPluginCheckoutResponse.fromMap(response.message! as Map<String, dynamic>);
   }
 
   /// Only available for iOS, on Android always returns false.
