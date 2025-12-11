@@ -1,3 +1,8 @@
+## 0.14.0
+
+* Upgrade native SDKs
+* Upgrade dependencies
+
 ## 0.13.0
 
 * iOS: upgrade native SDK

@@ -203,7 +203,7 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
     
     // Returns "ok" if everything is ok, otherwise returns the error message
     private func openSettings(completion: @escaping ((String) -> Void)) {
-        SumUpSDK.presentCheckoutPreferences(from: topController(), animated: true)
+        SumUpSDK.presentCardReaderSettings(from: topController(), animated: true)
         { (_: Bool, presentationError: Error?) in
             guard let safeError = presentationError as NSError? else {
                 completion("ok")

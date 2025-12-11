@@ -2,14 +2,14 @@ group 'io.purplesoft.sumup'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.6.10'
+    ext.kotlin_version = '2.1.0'
     repositories {
         mavenCentral()
         google()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.2.2'
+        classpath 'com.android.tools.build:gradle:8.13.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -28,15 +28,14 @@ apply plugin: 'kotlin-android'
 android {
     namespace 'io.purplesoft.sumup'
 
-    compileSdk 33
+    compileSdk 36
 
     kotlinOptions {
         jvmTarget = '1.8'
     }
     
     defaultConfig {
-        targetSdkVersion 33
-        consumerProguardFiles 'consumer-rules.pro'
+        targetSdkVersion 36
     }
 
     sourceSets {
@@ -52,6 +51,6 @@ android {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation "com.google.android.gms:play-services-location:21.0.1"
-    api 'com.sumup:merchant-sdk:5.0.3'
+    implementation "com.google.android.gms:play-services-location:21.3.0"
+    api 'com.sumup:merchant-sdk:6.0.0'
 }

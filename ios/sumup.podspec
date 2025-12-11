@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'sumup'
-  s.version          = '0.13.0'
+  s.version          = '0.14.0'
   s.summary          = 'Flutter wrapper to use the Sumup SDK.'
   s.description      = <<-DESC
   Flutter wrapper to use the Sumup SDK. With this plugin, your app can easily connect to a Sumup terminal, login and accept card payments on Android and iOS.
@@ -15,8 +15,8 @@ Pod::Spec.new do |s|
   s.source           = { :path => '.' }
   s.source_files = 'sumup/Sources/sumup'
   s.dependency 'Flutter'
-  s.dependency 'SumUpSDK', '6.1.1'
-  s.platform = :ios, '15.0'
+  s.dependency 'SumUpSDK', '6.2.0'
+  s.platform = :ios, '16.0'
 
   # Flutter.framework does not contain a i386 slice. Only x86_64 simulators are supported.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'VALID_ARCHS[sdk=iphonesimulator*]' => 'x86_64' }

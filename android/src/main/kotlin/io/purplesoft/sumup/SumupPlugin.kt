@@ -6,12 +6,12 @@ import android.os.Bundle
 import android.util.Log
 import androidx.annotation.NonNull
 import androidx.annotation.Nullable
+import com.sumup.reader.sdk.api.SumUpState
+import com.sumup.checkout.core.models.TransactionInfo
 import com.sumup.merchant.reader.api.SumUpAPI
 import com.sumup.merchant.reader.api.SumUpLogin
 import com.sumup.merchant.reader.api.SumUpPayment
 import com.sumup.merchant.reader.api.SumUpPayment.builder
-import com.sumup.merchant.reader.api.SumUpState
-import com.sumup.merchant.reader.models.TransactionInfo
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
