@@ -6,7 +6,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  final String affiliateKey = '***REMOVED***';
+  final String affiliateKey = 'your-affiliate-key';
 
   @override
   Widget build(BuildContext context) {
