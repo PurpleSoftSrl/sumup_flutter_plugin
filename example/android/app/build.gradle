@@ -25,10 +25,16 @@ if (flutterVersionName == null) {
 android {
     namespace "io.purplesoft.sumup_example"
 
-    compileSdkVersion 34
+    compileSdkVersion 35
+
+    compileOptions {
+        coreLibraryDesugaringEnabled true
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
 
     sourceSets {
@@ -38,9 +44,10 @@ android {
     defaultConfig {
         applicationId "io.purplesoft.sumup_example"
         minSdkVersion 26
-        targetSdkVersion 34
+        targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -56,4 +63,8 @@ android {
 
 flutter {
     source '../..'
+}
+
+dependencies {
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
 }

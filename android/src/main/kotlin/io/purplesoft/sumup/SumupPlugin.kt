@@ -10,8 +10,8 @@ import com.sumup.merchant.reader.api.SumUpAPI
 import com.sumup.merchant.reader.api.SumUpLogin
 import com.sumup.merchant.reader.api.SumUpPayment
 import com.sumup.merchant.reader.api.SumUpPayment.builder
-import com.sumup.merchant.reader.api.SumUpState
-import com.sumup.merchant.reader.models.TransactionInfo
+import com.sumup.reader.sdk.api.SumUpState
+import com.sumup.checkout.core.models.TransactionInfo
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -259,6 +259,7 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
                 SumUpTask.CHECKOUT -> {
                     val txCode = extra.getString(SumUpAPI.Response.TX_CODE)
                     val receiptSent = extra.getBoolean(SumUpAPI.Response.RECEIPT_SENT)
+                    @Suppress("DEPRECATION")
                     val txInfo: TransactionInfo? = extra.getParcelable(SumUpAPI.Response.TX_INFO)
 
                     currentOp.response.message = mutableMapOf(
@@ -322,7 +323,7 @@ enum class SumUpTask(val code: Int) {
     LOGIN(1), CHECKOUT(2), SETTINGS(3), TOKEN_LOGIN(4);
 
     companion object {
-        fun valueOf(value: Int) = values().find { it.code == value }
+        fun valueOf(value: Int) = entries.find { it.code == value }
     }
 }
 

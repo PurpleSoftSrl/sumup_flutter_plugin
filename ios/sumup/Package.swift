@@ -6,13 +6,13 @@ import PackageDescription
 let package = Package(
     name: "sumup",
     platforms: [
-        .iOS(.v15)
+        .iOS(.v16)
     ],
     products: [
         .library(name: "sumup", targets: ["sumup"])
     ],
     dependencies: [
-        .package(url: "https://github.com/sumup/sumup-ios-sdk.git", from: "6.1.1"),
+        .package(url: "https://github.com/sumup/sumup-ios-sdk.git", from: "6.2.1"),
     ],
     targets: [
         .target(

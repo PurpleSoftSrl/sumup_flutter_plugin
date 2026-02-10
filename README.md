@@ -56,7 +56,7 @@ Support this project by purchasing SumUp terminals through our affiliate links f
 1) Registered for a merchant account via SumUp's [country websites](https://sumup.it/purplesoft) (or received a test account).
 2) Received SumUp card terminal: Solo, Air, Air Lite, PIN+ terminal, Chip & Signature reader, or SumUp Air Register.
 3) Requested an Affiliate (Access) Key and registered your application ID via [SumUp Dashboard](https://me.sumup.com/developers) for Developers.
-4) Deployment Target iOS 15.0 or higher.
+4) Deployment Target iOS 16.0 or higher.
 5) Android minSdkVersion 26 or higher.
 
 ## Installing

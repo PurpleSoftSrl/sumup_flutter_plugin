@@ -10,7 +10,13 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
     }
     
     private func topController() -> UIViewController {
-        return UIApplication.shared.keyWindow!.rootViewController!
+        guard let windowScene = UIApplication.shared.connectedScenes
+                .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
+              let window = windowScene.windows.first(where: { $0.isKeyWindow }),
+              let rootViewController = window.rootViewController else {
+            fatalError("Unable to get root view controller")
+        }
+        return rootViewController
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {

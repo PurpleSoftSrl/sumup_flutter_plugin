@@ -1,3 +1,8 @@
+## 0.13.1
+
+* Android: upgrade Kotlin to 2.1.0
+* Upgrade dependencies
+
 ## 0.13.0
 
 * iOS: upgrade native SDK
