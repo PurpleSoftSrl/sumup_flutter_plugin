@@ -6,6 +6,7 @@ import android.util.Log
 import com.sumup.taptopay.TapToPay
 import com.sumup.taptopay.TapToPayApiProvider
 import com.sumup.taptopay.auth.AuthTokenProvider
+import com.sumup.taptopay.payment.domain.model.api.AffiliateModel
 import com.sumup.taptopay.payment.domain.model.api.CheckoutData
 import com.sumup.taptopay.payment.domain.model.api.PaymentEvent
 import kotlinx.coroutines.flow.catch
@@ -111,6 +112,7 @@ internal object TapToPayRunner {
         applicationContext: Context,
         payment: Map<String, Any?>,
         accessToken: String?,
+        affiliateKey: String?,
         onResult: (Map<String, Any?>) -> Unit
     ) {
         if (accessToken.isNullOrBlank()) {
@@ -150,10 +152,20 @@ internal object TapToPayRunner {
             val tip = (payment["tip"] as? Number)?.toDouble() ?: 0.0
             val totalMinor = (total * 100).toLong()
             val tipsMinor = if (tip > 0) (tip * 100).toLong() else null
-            val clientTxId = (payment["foreignTransactionId"] as? String)
+            val requestedForeignTransactionId = (payment["foreignTransactionId"] as? String)
                 ?.takeIf { it.isNotBlank() }
+            val clientTxId = requestedForeignTransactionId
                 ?: UUID.randomUUID().toString()
             val skipSuccessScreen = payment["skipSuccessScreen"] == true
+            val affiliateData = affiliateKey
+                ?.takeIf { it.isNotBlank() }
+                ?.let { key ->
+                    AffiliateModel(
+                        key,
+                        requestedForeignTransactionId,
+                        null
+                    )
+                }
             val checkoutData = CheckoutData(
                 totalAmount = totalMinor,
                 tipsAmount = tipsMinor,
@@ -163,7 +175,7 @@ internal object TapToPayRunner {
                 priceItems = null,
                 products = null,
                 processCardAs = null,
-                affiliateData = null
+                affiliateData = affiliateData
             )
             // resultSent guards against duplicate onResult calls:
             // TransactionDone fires first; PaymentFlowClosedSuccessfully fires after the

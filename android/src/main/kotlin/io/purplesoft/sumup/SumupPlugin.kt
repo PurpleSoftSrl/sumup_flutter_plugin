@@ -231,6 +231,7 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
                 applicationContext = activity.applicationContext,
                 payment = payment,
                 accessToken = ttpAccessToken,
+                affiliateKey = affiliateKey,
                 onResult = { responseMap ->
                     result.success(
                         mapOf(
