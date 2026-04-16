@@ -161,9 +161,9 @@ internal object TapToPayRunner {
                 ?.takeIf { it.isNotBlank() }
                 ?.let { key ->
                     AffiliateModel(
-                        key,
-                        requestedForeignTransactionId,
-                        null
+                            key = key,
+                            foreignTransactionId = requestedForeignTransactionId,
+                            tags = null
                     )
                 }
             val checkoutData = CheckoutData(
