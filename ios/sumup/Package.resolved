@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sumup/sumup-ios-sdk",
       "state" : {
-        "revision" : "4205e17e77e3b8385d9ab7e799188ce75dd1423d",
-        "version" : "7.1.0"
+        "revision" : "47d8761577d96147c88bab6481616f33c42e725d",
+        "version" : "6.1.2"
       }
     }
   ],

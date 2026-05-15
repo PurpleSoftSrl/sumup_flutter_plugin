@@ -26,9 +26,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.math.BigDecimal
 import java.util.UUID
 
+
+/** SumupPlugin */
 class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegistry.ActivityResultListener {
     private val tag = "SumupPlugin"
 
@@ -39,31 +40,10 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
     private lateinit var channel: MethodChannel
     private lateinit var activity: Activity
 
+    /** Stored token for Tap-to-Pay SDK (set when loginWithToken is called). */
     private var ttpAccessToken: String? = null
 
     private val pluginScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
-
-    // ── DRY helpers ──────────────────────────────────────────
-
-    private fun respond(key: String, status: Boolean, message: Map<String, Any?>): SumUpPluginResponseWrapper {
-        val o = operations[key]
-        return if (o != null) {
-            with(o.response) {
-                this.status = status
-                this.message = message.toMutableMap()
-            }
-            o
-        } else {
-            currentOperation?.also {
-                with(it.response) {
-                    this.status = status
-                    this.message = message.toMutableMap()
-                }
-            } ?: throw IllegalStateException("No active operation for key: $key")
-        }
-    }
-
-    // ── Engine lifecycle ─────────────────────────────────────
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         Log.d(tag, "Sumup plugin: engine attached.")
@@ -82,32 +62,34 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
         binding.addActivityResultListener(this)
     }
 
-    override fun onDetachedFromActivityForConfigChanges() {}
-    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {}
-    override fun onDetachedFromActivity() {}
+    override fun onDetachedFromActivityForConfigChanges() {
+        Log.d(tag, "Sumup plugin: activity detached for config change.")
+    }
 
-    // ── Method dispatch ──────────────────────────────────────
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+        Log.d(tag, "Sumup plugin: activity reattached.")
+    }
+
+    override fun onDetachedFromActivity() {
+        Log.d(tag, "Sumup plugin: activity detached.")
+    }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         Log.d(tag, "Sumup plugin: method call: ${call.method}")
-
-        val wrapper = operations.getOrPut(call.method) { SumUpPluginResponseWrapper(result) }.also {
-            it.methodResult = result
-            it.response = SumupPluginResponse(call.method)
-            it.cleanup = { operations.remove(call.method) }
+        if (!operations.containsKey(call.method)) {
+            operations[call.method] = SumUpPluginResponseWrapper(result)
         }
-        currentOperation = wrapper
+
+        val sumUpPluginResponseWrapper = operations[call.method]!!
+        sumUpPluginResponseWrapper.methodResult = result
+        sumUpPluginResponseWrapper.response = SumupPluginResponse(call.method)
+
+        currentOperation = sumUpPluginResponseWrapper
 
         when (call.method) {
-            "initSDK" -> {
-                val key = call.arguments as? String
-                (if (key != null) initSDK(key) else respond("initSDK", false, mapOf("errors" to "Missing affiliate key"))).flutterResult()
-            }
+            "initSDK" -> initSDK(call.arguments as String).flutterResult()
             "login" -> login()
-            "loginWithToken" -> {
-                val token = call.arguments as? String
-                if (token != null) loginWithToken(token) else respond("loginWithToken", false, mapOf("errors" to "Missing token"))
-            }
+            "loginWithToken" -> loginWithToken(call.arguments as String)
             "isLoggedIn" -> isLoggedIn().flutterResult()
             "getMerchant" -> getMerchant().flutterResult()
             "openSettings" -> openSettings()
@@ -118,10 +100,7 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
                 val paymentMethod = (args["paymentMethod"] as? String) ?: "cardReader"
                 val info = args["info"] as? Map<String, String>
                 if (payment == null) {
-                    result.success(SumupPluginResponse("checkout").apply {
-                        status = false
-                        message = mutableMapOf("errors" to "payment is required")
-                    }.toMap())
+                    result.success(SumupPluginResponse("checkout").apply { status = false; message = mutableMapOf("errors" to "payment is required") }.toMap())
                 } else {
                     checkout(payment, paymentMethod, info, result)
                 }
@@ -132,23 +111,22 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
             "checkTapToPayAvailability" -> checkTapToPayAvailability(result)
             "presentTapToPayActivation" -> presentTapToPayActivation(result)
             "logout" -> logout(result)
-            "isCardReaderConnected" ->
-                respond("isCardReaderConnected", true, mapOf("connected" to SumUpAPI.isCardReaderConnected())).flutterResult()
-            "getSavedCardReaderDetails" -> getSavedCardReaderDetails(result)
             else -> result.notImplemented()
         }
     }
 
-    // ── SDK operations ───────────────────────────────────────
-
     private fun initSDK(@NonNull key: String): SumUpPluginResponseWrapper {
-        return try {
+        val currentOp = operations["initSDK"]!!
+        try {
             SumUpState.init(activity.applicationContext)
             affiliateKey = key
-            respond("initSDK", true, mapOf("initialized" to true))
+            currentOp.response.message = mutableMapOf("initialized" to true)
+            currentOp.response.status = true
         } catch (e: Exception) {
-            respond("initSDK", false, mapOf("initialized" to false, "errors" to e.message))
+            currentOp.response.message = mutableMapOf("initialized" to false, "errors" to e.message)
+            currentOp.response.status = false
         }
+        return currentOp
     }
 
     private fun login() {
@@ -164,14 +142,25 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
 
     private fun isLoggedIn(): SumUpPluginResponseWrapper {
         val loggedIn = SumUpAPI.isLoggedIn()
-        return respond("isLoggedIn", loggedIn, mapOf("isLoggedIn" to loggedIn))
+
+        val currentOp = operations["isLoggedIn"]!!
+        currentOp.response.message = mutableMapOf("isLoggedIn" to loggedIn)
+        currentOp.response.status = loggedIn
+
+        return currentOp
     }
 
     private fun getMerchant(): SumUpPluginResponseWrapper {
-        val merchant = SumUpAPI.getCurrentMerchant()
-        val code = merchant?.merchantCode ?: ""
-        val currency = merchant?.currency?.isoCode ?: ""
-        return respond("getMerchant", code.isNotEmpty(), mapOf("merchantCode" to code, "currencyCode" to currency))
+        val currentMerchant = SumUpAPI.getCurrentMerchant()
+        val mCode = currentMerchant?.merchantCode ?: ""
+        val mCurrency = currentMerchant?.currency?.isoCode ?: ""
+        val mCodeValid = mCode != ""
+
+        val currentOp = operations["getMerchant"]!!
+        currentOp.response.message = mutableMapOf("merchantCode" to mCode, "currencyCode" to mCurrency)
+        currentOp.response.status = mCodeValid
+
+        return currentOp
     }
 
     private fun openSettings() {
@@ -181,7 +170,12 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
     private fun prepareForCheckout(): SumUpPluginResponseWrapper {
         Log.d(tag, "Sumup plugin: prepare for checkout.")
         SumUpAPI.prepareForCheckout()
-        return respond("prepareForCheckout", true, mapOf("prepareForCheckout" to true))
+
+        val currentOp = operations["prepareForCheckout"]!!
+        currentOp.response.message = mutableMapOf("prepareForCheckout" to true)
+        currentOp.response.status = true
+
+        return currentOp
     }
 
     private fun checkout(
@@ -194,53 +188,39 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
             runTapToPayCheckout(payment, result)
             return
         }
+        // Card reader checkout (existing flow; result delivered via onActivityResult)
         checkoutCardReader(payment, info)
     }
 
     private fun checkoutCardReader(@NonNull args: Map<String, Any?>, @Nullable info: Map<String, String>?) {
         Log.d(tag, "Sumup plugin: checkout (card reader).")
-        val totalStr = args["total"]?.toString()
-        if (totalStr == null) {
-            respond("checkout", false, mapOf("errors" to "Missing total")).flutterResult()
-            return
-        }
-        val currencyStr = args["currency"] as? String
-        if (currencyStr == null) {
-            respond("checkout", false, mapOf("errors" to "Missing currency")).flutterResult()
-            return
-        }
-        val currency = try {
-            SumUpPayment.Currency.valueOf(currencyStr)
-        } catch (e: IllegalArgumentException) {
-            respond("checkout", false, mapOf("errors" to "Invalid currency: $currencyStr")).flutterResult()
-            return
-        }
-
         val payment = builder()
-            .total(BigDecimal(totalStr))
-            .title(args["title"] as? String)
-            .currency(currency)
+                .total((args["total"] as Double).toBigDecimal())
+                .title(args["title"] as String?)
+                .currency(SumUpPayment.Currency.valueOf(args["currency"] as String))
 
-        val tip = args["tip"]
-        if (tip is Number) payment.tip(BigDecimal(tip.toString()))
-        if (args["tipOnCardReader"] == true) {
-            if (isTipOnCardReaderAvailable().response.status) {
+        if (args["tip"] != null) payment.tip((args["tip"] as Double).toBigDecimal())
+        if (args["tipOnCardReader"] != null && args["tipOnCardReader"] as Boolean) {
+            val isTcrAvailable = isTipOnCardReaderAvailable().response.status
+            if (isTcrAvailable) {
                 payment.tipOnCardReader()
             }
         }
-        (args["customerEmail"] as? String)?.let { payment.receiptEmail(it) }
-        (args["customerPhone"] as? String)?.let { payment.receiptSMS(it) }
-        (args["foreignTransactionId"] as? String)?.let { payment.foreignTransactionId(it) }
-        if (args["skipSuccessScreen"] == true) payment.skipSuccessScreen()
-        if (args["skipFailureScreen"] == true) payment.skipFailedScreen()
+
+        if (args["customerEmail"] != null) payment.receiptEmail(args["customerEmail"] as String)
+        if (args["customerPhone"] != null) payment.receiptSMS(args["customerPhone"] as String)
+
+        if (args["foreignTransactionId"] != null) payment.foreignTransactionId(args["foreignTransactionId"] as String?)
+
+        if (args["skipSuccessScreen"] != null && args["skipSuccessScreen"] as Boolean) payment.skipSuccessScreen()
+
+        if (args["skipFailureScreen"] != null && args["skipFailureScreen"] as Boolean) payment.skipFailedScreen()
 
         if (!info.isNullOrEmpty()) {
             for (item in info) {
                 payment.addAdditionalInfo(item.key, item.value)
             }
         }
-
-        (args["successScreenTimeout"] as? Int)?.let { payment.successScreenTimeout(it) }
 
         SumUpAPI.checkout(activity, payment.build(), 2)
     }
@@ -251,7 +231,7 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
                 applicationContext = activity.applicationContext,
                 payment = payment,
                 accessToken = ttpAccessToken,
-                affiliateKey = if (this@SumupPlugin::affiliateKey.isInitialized) this@SumupPlugin.affiliateKey else null,
+                    affiliateKey = if (this@SumupPlugin::affiliateKey.isInitialized) this@SumupPlugin.affiliateKey else null,
                 onResult = { responseMap ->
                     result.success(
                         mapOf(
@@ -295,22 +275,40 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
     }
 
     private fun presentTapToPayActivation(result: Result) {
+        // No activation UI on Android; TTP is ready after init with token.
         val response = SumupPluginResponse("presentTapToPayActivation")
         response.message = mutableMapOf("result" to "Not required on Android")
         response.status = true
         result.success(response.toMap())
     }
 
-    private fun isCheckoutInProgress(): SumUpPluginResponseWrapper =
-        respond("isCheckoutInProgress", false, mapOf("exception" to "isCheckoutInProgress method is not implemented in android"))
-
-    private fun isTipOnCardReaderAvailable(): SumUpPluginResponseWrapper {
-        val isAvailable = SumUpAPI.isTipOnCardReaderAvailable()
-        return respond("isTipOnCardReaderAvailable", isAvailable, mapOf("isAvailable" to isAvailable))
+    private fun isCheckoutInProgress(): SumUpPluginResponseWrapper {
+        Log.d(tag, "Sumup plugin: is checkout in progress.")
+        val currentOp = operations["isCheckoutInProgress"]!!
+        currentOp.response.message = mutableMapOf("exception" to "isCheckoutInProgress method is not implemented in android")
+        currentOp.response.status = false
+        return currentOp
     }
 
-    private fun isCardTypeRequired(): SumUpPluginResponseWrapper =
-        respond("isCardTypeRequired", false, mapOf("exception" to "isCardTypeRequired method is not implemented in android"))
+    private fun isTipOnCardReaderAvailable(): SumUpPluginResponseWrapper {
+        Log.d(tag, "Sumup plugin: is tip on card reader available.")
+
+        val isAvailable = SumUpAPI.isTipOnCardReaderAvailable()
+        
+        val currentOp = operations["isTipOnCardReaderAvailable"] ?: currentOperation!!
+        currentOp.response.message = mutableMapOf("isAvailable" to isAvailable)
+        currentOp.response.status = isAvailable
+        return currentOp
+    }
+
+    private fun isCardTypeRequired(): SumUpPluginResponseWrapper {
+        Log.d(tag, "Sumup plugin: is card type required.")
+        val currentOp = operations["isCardTypeRequired"]!!
+        currentOp.response.message =
+            mutableMapOf("exception" to "isCardTypeRequired method is not implemented in android")
+        currentOp.response.status = false
+        return currentOp
+    }
 
     private fun logout(result: Result) {
         Log.d(tag, "Sumup plugin: logout.")
@@ -331,27 +329,19 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
         }
     }
 
-    private fun getSavedCardReaderDetails(result: Result) {
-        result.success(SumupPluginResponse("getSavedCardReaderDetails").apply {
-            status = false
-            message = mutableMapOf("error" to "getSavedCardReaderDetails not yet implemented — API shape TBD")
-        }.toMap())
-    }
-
-    // ── Activity result ──────────────────────────────────────
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
         Log.d(tag, "Sumup plugin: activity result. RequestCode: $requestCode, ResultCode: $resultCode")
         val resultCodes = intArrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
+
         if (resultCode !in resultCodes) return false
 
-        val task = SumUpTask.valueOf(requestCode) ?: return false
-        val currentOp = when (task) {
+        val currentOp: SumUpPluginResponseWrapper = when (SumUpTask.valueOf(requestCode)) {
             SumUpTask.LOGIN -> operations["login"]
             SumUpTask.TOKEN_LOGIN -> operations["loginWithToken"]
             SumUpTask.CHECKOUT -> operations["checkout"]
             SumUpTask.SETTINGS -> operations["openSettings"]
-        } ?: currentOperation ?: return false
+            else -> currentOperation
+        } ?: return false
 
         if (data != null && data.extras != null) {
             val extra: Bundle = data.extras!!
@@ -360,14 +350,13 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
             val resultCodeBoolean = resultCodeInt == 1
             currentOp.response.status = resultCodeBoolean
 
-            when (task) {
-                SumUpTask.LOGIN, SumUpTask.TOKEN_LOGIN -> {
-                    currentOp.response.message = mutableMapOf(
-                        "loginResult" to resultCodeBoolean,
-                        "responseCode" to resultCodeInt,
-                        "responseMessage" to resultMessage,
-                        "requestCode" to requestCode
-                    )
+            when (SumUpTask.valueOf(requestCode)) {
+                SumUpTask.LOGIN -> {
+                    currentOp.response.message = mutableMapOf("loginResult" to resultCodeBoolean, "responseCode" to resultCodeInt, "responseMessage" to resultMessage, "requestCode" to requestCode)
+                    currentOp.flutterResult()
+                }
+                SumUpTask.TOKEN_LOGIN -> {
+                    currentOp.response.message = mutableMapOf("loginResult" to resultCodeBoolean, "responseCode" to resultCodeInt, "responseMessage" to resultMessage, "requestCode" to requestCode)
                     currentOp.flutterResult()
                 }
                 SumUpTask.CHECKOUT -> {
@@ -377,55 +366,60 @@ class SumupPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegis
                     val txInfo: TransactionInfo? = extra.getParcelable(SumUpAPI.Response.TX_INFO)
 
                     currentOp.response.message = mutableMapOf(
-                        "responseCode" to resultCodeInt,
-                        "responseMessage" to resultMessage,
-                        "txCode" to txCode,
-                        "receiptSent" to receiptSent,
-                        "requestCode" to requestCode,
-                        "success" to resultCodeBoolean
-                    )
+                            "responseCode" to resultCodeInt,
+                            "responseMessage" to resultMessage,
+                            "txCode" to txCode,
+                            "receiptSent" to receiptSent,
+                            "requestCode" to requestCode,
+                            "success" to resultCodeBoolean
+                            )
+
                     txInfo?.toMap()?.let { currentOp.response.message.putAll(it) }
+
                     currentOp.flutterResult()
                 }
-                SumUpTask.SETTINGS -> {
-                    currentOp.response.message = mutableMapOf("responseCode" to resultCodeInt, "responseMessage" to resultMessage, "requestCode" to requestCode)
-                    currentOp.response.status = true
+                else -> {
+                    //UNKNOWN SUMUP TASK
+                    //USE CURRENT OPERATION TO EMIT A RESULT
+                    //IN THEORY THIS CASE NEVER HAPPEN
+                    currentOp.response.message = mutableMapOf("responseCode" to resultCodeInt, "responseMessage" to resultMessage, "errors" to "Unknown SumUp Task", "requestCode" to requestCode)
                     currentOp.flutterResult()
                 }
             }
-        } else when (task) {
-            SumUpTask.SETTINGS -> {
-                currentOp.response.message = mutableMapOf("responseCode" to resultCode, "requestCode" to requestCode)
-                currentOp.response.status = true
-                currentOp.flutterResult()
-            }
-            SumUpTask.LOGIN, SumUpTask.TOKEN_LOGIN, SumUpTask.CHECKOUT -> {
-                currentOp.response.message = mutableMapOf("responseCode" to resultCode, "requestCode" to requestCode)
-                currentOp.response.status = false
-                currentOp.flutterResult()
-            }
+          } else if (SumUpTask.valueOf(requestCode) == SumUpTask.SETTINGS) {
+            currentOp.response.message = mutableMapOf("responseCode" to resultCode, "requestCode" to requestCode)
+            currentOp.response.status = true
+            currentOp.flutterResult()
+        } else if (SumUpTask.valueOf(requestCode) == SumUpTask.LOGIN) {
+            currentOp.response.message = mutableMapOf("responseCode" to resultCode, "requestCode" to requestCode)
+            currentOp.response.status = false
+            currentOp.flutterResult()
+        } else if (SumUpTask.valueOf(requestCode) == SumUpTask.TOKEN_LOGIN) {
+            currentOp.response.message = mutableMapOf("responseCode" to resultCode, "requestCode" to requestCode)
+            currentOp.response.status = false
+            currentOp.flutterResult()
+        } else {
+            currentOp.response.message = mutableMapOf("errors" to "Intent Data and/or Extras are null or empty")
+            currentOp.response.status = false
         }
 
         return currentOp.response.status
     }
 }
 
-// ── Support types ────────────────────────────────────────────
-
 class SumUpPluginResponseWrapper(@NonNull var methodResult: Result) {
     lateinit var response: SumupPluginResponse
-    internal var cleanup: (() -> Unit)? = null
     fun flutterResult() {
         methodResult.success(response.toMap())
-        cleanup?.invoke()
     }
 }
 
 class SumupPluginResponse(@NonNull var methodName: String) {
     var status: Boolean = false
     lateinit var message: MutableMap<String, Any?>
-    fun toMap(): Map<String, Any?> =
-        mapOf("status" to status, "message" to message, "methodName" to methodName)
+    fun toMap(): Map<String, Any?> {
+        return mapOf("status" to status, "message" to message, "methodName" to methodName)
+    }
 }
 
 enum class SumUpTask(val code: Int) {
@@ -439,27 +433,29 @@ enum class SumUpTask(val code: Int) {
 fun TransactionInfo.toMap(): Map<String, Any?> {
     val card = card.toMap()
     val m = mutableMapOf(
-        "transactionCode" to transactionCode,
-        "amount" to amount,
-        "currency" to currency,
-        "vatAmount" to vatAmount,
-        "tipAmount" to tipAmount,
-        "paymentType" to paymentType,
-        "entryMode" to entryMode,
-        "installments" to installments,
-        "cardType" to card["type"],
-        "cardLastDigits" to card["last4Digits"],
-        "merchantCode" to merchantCode,
-        "foreignTransactionId" to foreignTransactionId,
-        "products" to products?.map { product ->
-            mapOf<String, Any?>(
-                "name" to product.name,
-                "price" to product.price,
-                "quantity" to product.quantity
-            )
-        }
+            "transactionCode" to transactionCode,
+            "amount" to amount,
+            "currency" to currency,
+            "vatAmount" to vatAmount,
+            "tipAmount" to tipAmount,
+            "paymentType" to paymentType,
+            "entryMode" to entryMode,
+            "installments" to installments,
+            "cardType" to card["type"],
+            "cardLastDigits" to card["last4Digits"],
+            "merchantCode" to merchantCode,
+            "foreignTransactionId" to foreignTransactionId,
+            "products" to products?.map { product ->
+                mapOf<String, Any?>(
+                    "name" to product.name,
+                    "price" to product.price,
+                    "quantity" to product.quantity
+                )
+            }
     )
+
     m["success"] = status.equals("SUCCESSFUL", true)
+
     return m
 }
 

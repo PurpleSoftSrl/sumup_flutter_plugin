@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs
 import 'dart:io';
 
 import 'sumup_product.dart';
@@ -29,20 +28,18 @@ class SumupPluginCheckoutResponse {
     this.cardScheme,
   });
 
-  /// Deserializes a checkout response from a map (native platform bridge).
-  /// Creates a checkout response from the native channel map.
   SumupPluginCheckoutResponse.fromMap(Map<dynamic, dynamic> response) {
-    success = response['success'] as bool?;
-    transactionCode = response['transactionCode'] as String?;
-    amount = _toDouble(response['amount']);
-    currency = response['currency'] as String?;
-    vatAmount = _toDouble(response['vatAmount']);
-    tipAmount = _toDouble(response['tipAmount']);
-    paymentType = response['paymentType'] as String?;
-    entryMode = response['entryMode'] as String?;
-    installments = _toInt(response['installments']);
-    cardType = response['cardType'] as String?;
-    cardLastDigits = response['cardLastDigits'] as String?;
+    success = response['success'];
+    transactionCode = response['transactionCode'];
+    amount = response['amount'];
+    currency = response['currency'];
+    vatAmount = response['vatAmount'];
+    tipAmount = response['tipAmount'];
+    paymentType = response['paymentType'];
+    entryMode = response['entryMode'];
+    installments = int.tryParse(response['installments'].toString());
+    cardType = response['cardType'];
+    cardLastDigits = response['cardLastDigits'];
     userDismissedSuccessScreen = response['userDismissedSuccessScreen'] as bool?;
     errors = response['errors']?.toString();
     merchantCode = response['merchantCode']?.toString();
@@ -50,65 +47,33 @@ class SumupPluginCheckoutResponse {
     final rawProducts = response['products'];
     if (rawProducts is List) {
       products = rawProducts
-          .whereType<Map<dynamic, dynamic>>()
+          .whereType<Map>()
           .map((e) => SumupProduct.fromMap(e))
           .toList();
     }
 
+    // some parameters are available only for Android
     if (Platform.isAndroid) {
-      foreignTransactionId = response['foreignTransactionId'] as String?;
-      receiptSent = response['receiptSent'] as bool?;
+      foreignTransactionId = response['foreignTransactionId'];
+      receiptSent = response['receiptSent'];
     }
-  }
-
-  /// Converts a dynamic value to [double], handling null, int, and String types.
-  static double? _toDouble(dynamic v) {
-    if (v == null) return null;
-    if (v is double) return v;
-    if (v is int) return v.toDouble();
-    if (v is String) return double.tryParse(v);
-    return null;
-  }
-
-  /// Converts a dynamic value to [int], handling null and String types.
-  static int? _toInt(dynamic v) {
-    if (v == null) return null;
-    if (v is int) return v;
-    if (v is String) return int.tryParse(v);
-    return null;
   }
 
   /// Transaction's outcome
   bool? success;
 
-  /// Unique transaction identifier.
   String? transactionCode;
-
-  /// Last 4 digits of the card used (card reader only).
   String? cardLastDigits;
-
-  /// Card type (e.g. VISA, MASTERCARD).
   String? cardType;
 
   /// Total amount including tip and VAT
   double? amount;
 
-  /// VAT amount included in the transaction.
   double? vatAmount;
-
-  /// Tip amount included in the transaction.
   double? tipAmount;
-
-  /// ISO 4217 currency code (e.g. EUR, USD).
   String? currency;
-
-  /// Payment method (e.g. CARD, CASH).
   String? paymentType;
-
-  /// Card entry mode (e.g. EMV, MAGSTRIPE).
   String? entryMode;
-
-  /// Number of installments (Android only).
   int? installments;
 
   /// **Android only**
@@ -134,7 +99,6 @@ class SumupPluginCheckoutResponse {
   /// Available on iOS and Android (card reader only; not available for Tap-to-Pay).
   List<SumupProduct>? products;
 
-  @override
   String toString() {
     return 'Success: $success, transactionCode: $transactionCode, amount: $amount, currency: $currency${errors != null ? ", errors: $errors" : ""}';
   }

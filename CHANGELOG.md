@@ -1,20 +1,3 @@
-## 0.14.2
-
-* Migrate to federated plugin architecture (SumUpPlatform + MethodChannelSumup)
-* Upgrade native SDKs: Android 7.0.0, iOS 7.1.0
-* Android: convert build.gradle → build.gradle.kts (Kotlin DSL)
-* Android: update AGP 8.11.1, Kotlin 2.2.20, Gradle 8.14, compileSdk 36
-* iOS: add PrivacyInfo.xcprivacy (mandatory Apple requirement)
-* iOS: SwiftSumUpPlugin → SumUpPlugin (remove legacy prefix)
-* iOS: fix NSDecimalNumber precision (floatLiteral → string:)
-* iOS: fix deprecated setup(affiliateKey:) and presentCardReaderSettings
-* iOS: add numberOfInstallments support
-* Add v7 features: successScreenTimeout, isCardReaderConnected, customTipRates, lastReaderStatus
-* Make TTP dependency conditional (plugin builds without credentials)
-* Fix force-casts in iOS/Kotlin with safe unwrap guards
-* Add analysis_options.yaml with strict type checks and dartdoc lint
-* Add unit test skeleton
-
 ## 0.14.1
 
 * Android: propagate `affiliateData` in Tap-to-Pay checkout (#68)

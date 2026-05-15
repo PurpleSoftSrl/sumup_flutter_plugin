@@ -1,9 +1,12 @@
+import 'dart:async';
+
+import 'package:flutter/services.dart';
+
 import 'models/sumup_payment_request.dart';
 import 'models/sumup_plugin_checkout_response.dart';
 import 'models/sumup_plugin_merchant_response.dart';
 import 'models/sumup_plugin_response.dart';
 import 'models/tap_to_pay_availability.dart';
-import 'src/sumup_platform_interface.dart';
 
 export 'models/sumup_payment.dart';
 export 'models/sumup_payment_request.dart';
@@ -13,30 +16,24 @@ export 'models/sumup_plugin_response.dart';
 export 'models/sumup_product.dart';
 export 'models/tap_to_pay_availability.dart';
 
-/// Flutter wrapper for the SumUp SDK.
-///
-/// With this plugin, your app can easily connect to a SumUp terminal, login,
-/// and accept card payments on Android and iOS. Supports card reader and
-/// Tap-to-Pay checkout.
 class Sumup {
   Sumup._();
 
-  static SumupPlatform get _platform => SumupPlatform.instance;
+  static const MethodChannel _channel = const MethodChannel('sumup');
 
-  /// Whether the SumUp SDK has been initialized.
-  static bool get isInitialized => _platform.isInitialized;
+  static bool _isInitialized = false;
 
   static void _throwIfNotInitialized() {
-    if (!_platform.isInitialized) {
-      throw StateError('SumUp SDK is not initialized. Call Sumup.init(affiliateKey) first.');
+    if (!_isInitialized) {
+      throw Exception(
+          'SumUp SDK is not initialized. You should call Sumup.init(affiliateKey)');
     }
   }
 
-  static Future<void> _requireLogin() async {
-    _throwIfNotInitialized();
+  static Future<void> _throwIfNotLoggedIn() async {
     final isLogged = await isLoggedIn;
     if (isLogged == null || !isLogged) {
-      throw StateError('Not logged in. Call Sumup.login() first.');
+      throw Exception('Not logged in. You must login before.');
     }
   }
 
@@ -45,109 +42,166 @@ class Sumup {
   /// Must be called only once before anything else. Calling this again has no effect since
   /// the SDK has already been initialized.
   static Future<SumupPluginResponse> init(String affiliateKey) async {
-    if (_platform.isInitialized) {
+    if (_isInitialized) {
       return SumupPluginResponse.fromMap({
         'methodName': 'initSDK',
         'status': true,
-        'message': {'initialized': true},
+        'message': {'initialized': true}
       });
     }
-    return _platform.init(affiliateKey);
+
+    final method = await _channel.invokeMethod('initSDK', affiliateKey);
+    final response = SumupPluginResponse.fromMap(method);
+    if (response.status) {
+      _isInitialized = true;
+    }
+    return response;
   }
 
   /// Shows SumUp login dialog.
+  ///
+  /// Should be called after [init].
   static Future<SumupPluginResponse> login() async {
     _throwIfNotInitialized();
-    return _platform.login();
+    final method = await _channel.invokeMethod('login');
+    return SumupPluginResponse.fromMap(method);
   }
 
   /// Uses Transparent authentication to login to SumUp SDK with supplied token.
+  ///
+  /// Should be called after [init].
   static Future<SumupPluginResponse> loginWithToken(String token) async {
     _throwIfNotInitialized();
-    return _platform.loginWithToken(token);
+    final method = await _channel.invokeMethod('loginWithToken', token);
+    return SumupPluginResponse.fromMap(method);
   }
 
   /// Returns whether merchant is already logged in.
   static Future<bool?> get isLoggedIn async {
     _throwIfNotInitialized();
-    return _platform.isLoggedIn;
+    final method = await _channel.invokeMethod('isLoggedIn');
+    return SumupPluginResponse.fromMap(method).status;
   }
 
   /// Returns the current merchant.
   static Future<SumupPluginMerchantResponse> get merchant async {
-    await _requireLogin();
-    return _platform.merchant;
+    _throwIfNotInitialized();
+    await _throwIfNotLoggedIn();
+    final method = await _channel.invokeMethod('getMerchant');
+    final response = SumupPluginResponse.fromMap(method);
+    return SumupPluginMerchantResponse.fromMap(response.message!);
   }
 
   /// Opens SumUp dialog to connect to a card terminal.
+  ///
+  /// Login required.
   static Future<SumupPluginResponse> openSettings() async {
-    await _requireLogin();
-    return _platform.openSettings();
+    _throwIfNotInitialized();
+    await _throwIfNotLoggedIn();
+    final method = await _channel.invokeMethod('openSettings');
+    return SumupPluginResponse.fromMap(method);
   }
 
-  /// Wakes up the card terminal before checkout. Deprecated, use [prepareForCheckout] instead.
+  /// Wakes up card terminal before real checkout to speed up bluetooth pairing process.
+  ///
+  /// Don't call this method during checkout because it can lead to checkout failure.
+  /// Login required.
   @Deprecated('Use prepareForCheckout() instead')
-  static Future<SumupPluginResponse> wakeUpTerminal() => prepareForCheckout();
+  static Future<SumupPluginResponse> wakeUpTerminal() async {
+    return prepareForCheckout();
+  }
 
-  /// Speeds up checkout time by waking the card terminal in advance.
+  /// Calling prepareForCheckout() before instancing a checkout will
+  /// speed up the checkout time.
+  ///
+  /// Don't call this method during checkout because it can lead to checkout failure.
+  /// Login required.
   static Future<SumupPluginResponse> prepareForCheckout() async {
-    await _requireLogin();
-    return _platform.prepareForCheckout();
+    _throwIfNotInitialized();
+    await _throwIfNotLoggedIn();
+    final method = await _channel.invokeMethod('prepareForCheckout');
+    return SumupPluginResponse.fromMap(method);
   }
 
   /// Checks if Tip on Card Reader (TCR) feature is available.
-  static Future<bool> get isTipOnCardReaderAvailable async {
-    await _requireLogin();
-    return _platform.isTipOnCardReaderAvailable;
-  }
-
-  /// Checks if card type is required in checkout (iOS only, Android returns false).
-  static Future<bool> get isCardTypeRequired async {
-    await _requireLogin();
-    return _platform.isCardTypeRequired;
-  }
-
-  /// Checks whether Tap-to-Pay is available and activated for the current merchant.
-  static Future<TapToPayAvailabilityResult> checkTapToPayAvailability() async {
-    await _requireLogin();
-    return _platform.checkTapToPayAvailability();
-  }
-
-  /// Presents Tap-to-Pay activation UI (iOS only).
-  static Future<SumupPluginResponse> presentTapToPayActivation() async {
-    await _requireLogin();
-    return _platform.presentTapToPayActivation();
-  }
-
-  /// Starts a checkout with [paymentRequest].
   ///
-  /// Validation of `tip` vs `tipOnCardReader` mutual exclusion is handled
-  /// by [SumupPayment]'s constructor assert.
+  /// Login required.
+  static Future<bool> get isTipOnCardReaderAvailable async {
+    _throwIfNotInitialized();
+    await _throwIfNotLoggedIn();
+    final method = await _channel.invokeMethod('isTipOnCardReaderAvailable');
+    return SumupPluginResponse.fromMap(method).status;
+  }
+
+  /// Checks if card type is required in checkout.
+  /// Only available for iOS, on Android always returns false.
+  ///
+  /// Login required.
+  static Future<bool> get isCardTypeRequired async {
+    _throwIfNotInitialized();
+    await _throwIfNotLoggedIn();
+    final method = await _channel.invokeMethod('isCardTypeRequired');
+    return SumupPluginResponse.fromMap(method).status;
+  }
+
+  /// Checks whether Tap-to-Pay is available for the current merchant and whether it is activated.
+  /// On iOS: uses SumUp SDK; on Android: reflects TTP SDK init state and device capability.
+  ///
+  /// Login required.
+  static Future<TapToPayAvailabilityResult> checkTapToPayAvailability() async {
+    _throwIfNotInitialized();
+    await _throwIfNotLoggedIn();
+    final method = await _channel.invokeMethod('checkTapToPayAvailability');
+    final response = SumupPluginResponse.fromMap(method);
+    final message = response.message ?? <String, dynamic>{};
+    return TapToPayAvailabilityResult.fromMap(Map<dynamic, dynamic>.from(message));
+  }
+
+  /// Presents Tap-to-Pay activation UI (iOS only). On Android this completes successfully with no UI.
+  /// Call after [checkTapToPayAvailability] if [TapToPayAvailabilityResult.isActivated] is false.
+  ///
+  /// Login required.
+  static Future<SumupPluginResponse> presentTapToPayActivation() async {
+    _throwIfNotInitialized();
+    await _throwIfNotLoggedIn();
+    final method = await _channel.invokeMethod('presentTapToPayActivation');
+    return SumupPluginResponse.fromMap(method);
+  }
+
+  /// Starts a checkout process with [paymentRequest].
+  ///
+  /// Login required.
   static Future<SumupPluginCheckoutResponse> checkout(
       SumupPaymentRequest paymentRequest) async {
-    await _requireLogin();
-    return _platform.checkout(paymentRequest);
+    _throwIfNotInitialized();
+    await _throwIfNotLoggedIn();
+
+    if (paymentRequest.payment.tipOnCardReader &&
+        paymentRequest.payment.tip > 0) {
+      throw Exception(
+          'Cannot perform checkout with [tip] greater than 0 and [tipOnCardReader] true');
+    }
+
+    final request = paymentRequest.toMap();
+    final method = await _channel.invokeMethod('checkout', request);
+    final response = SumupPluginResponse.fromMap(method);
+    return SumupPluginCheckoutResponse.fromMap(response.message!);
   }
 
-  /// Checks if a checkout is currently in progress (iOS only, Android returns false).
+  /// Only available for iOS, on Android always returns false.
+  ///
+  /// Login required.
   static Future<bool?> get isCheckoutInProgress async {
-    await _requireLogin();
-    return _platform.isCheckoutInProgress;
+    _throwIfNotInitialized();
+    await _throwIfNotLoggedIn();
+    final method = await _channel.invokeMethod('isCheckoutInProgress');
+    return SumupPluginResponse.fromMap(method).status;
   }
 
   /// Performs logout.
   static Future<SumupPluginResponse> logout() async {
     _throwIfNotInitialized();
-    return _platform.logout();
+    final method = await _channel.invokeMethod('logout');
+    return SumupPluginResponse.fromMap(method);
   }
-
-  /// Checks if a card reader is currently connected (Android v7+, iOS v7+).
-  static Future<bool> isCardReaderConnected() => _platform.isCardReaderConnected();
-
-  /// Returns saved card reader details (Android v7+).
-  static Future<SumupPluginResponse> getSavedCardReaderDetails() =>
-      _platform.getSavedCardReaderDetails();
-
-  /// Returns the most recent card reader status (iOS v7+).
-  static Future<SumupPluginResponse> lastReaderStatus() => _platform.lastReaderStatus();
 }

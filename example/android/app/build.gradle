@@ -25,7 +25,7 @@ if (flutterVersionName == null) {
 android {
     namespace "io.purplesoft.sumup_example"
 
-    compileSdkVersion 36
+    compileSdkVersion 35
 
     compileOptions {
         coreLibraryDesugaringEnabled true
@@ -44,7 +44,7 @@ android {
     defaultConfig {
         applicationId "io.purplesoft.sumup_example"
         minSdkVersion 30  // required by Tap-to-Pay SDK
-        targetSdkVersion 36
+        targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
@@ -69,6 +69,5 @@ flutter {
 
 dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
-    // Tap-to-Pay SDK: uncomment and set SUMUP_TTP_MAVEN_USERNAME / PASSWORD in gradle.properties to enable
-    // implementation 'com.sumup.tap-to-pay:utopia-sdk:1.0.6'
+    implementation 'com.sumup.tap-to-pay:utopia-sdk:1.0.6'
 }

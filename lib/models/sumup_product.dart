@@ -1,6 +1,6 @@
-// ignore_for_file: public_member_api_docs
-
-/// A product item in a checkout or transaction.
+/// A product item included in a transaction.
+///
+/// Available on iOS and Android (card reader checkout only).
 class SumupProduct {
   SumupProduct({
     this.name,
@@ -8,7 +8,6 @@ class SumupProduct {
     this.quantity,
   });
 
-  /// Deserializes a product from a map (native platform bridge).
   SumupProduct.fromMap(Map<dynamic, dynamic> map)
       : name = map['name'] as String?,
         price = (map['price'] as num?)?.toDouble(),

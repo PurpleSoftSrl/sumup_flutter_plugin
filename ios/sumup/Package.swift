@@ -12,7 +12,7 @@ let package = Package(
         .library(name: "sumup", targets: ["sumup"])
     ],
     dependencies: [
-        .package(url: "https://github.com/sumup/sumup-ios-sdk.git", from: "7.1.0"),
+        .package(url: "https://github.com/sumup/sumup-ios-sdk.git", from: "6.2.1"),
     ],
     targets: [
         .target(

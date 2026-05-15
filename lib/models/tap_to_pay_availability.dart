@@ -1,6 +1,4 @@
-// ignore_for_file: public_member_api_docs
-
-/// Result of checking Tap-to-Pay availability for the current merchant.
+/// Result of checking Tap-to-Pay availability.
 class TapToPayAvailabilityResult {
   TapToPayAvailabilityResult({
     required this.isAvailable,
@@ -17,7 +15,6 @@ class TapToPayAvailabilityResult {
   /// Error message from the native SDK, if availability check failed (e.g. init failed, attestation).
   final String? error;
 
-  /// Deserializes a Tap-to-Pay availability result from a map (native platform bridge).
   factory TapToPayAvailabilityResult.fromMap(Map<dynamic, dynamic> map) {
     return TapToPayAvailabilityResult(
       isAvailable: map['isAvailable'] == true,

@@ -1,6 +1,5 @@
 /// Payment object.
 class SumupPayment {
-  /// Creates a [SumupPayment] with the given parameters.
   SumupPayment({
     this.title,
     required this.total,
@@ -61,7 +60,6 @@ class SumupPayment {
   /// iOS only
   CardType? cardType;
 
-  /// Serializes this payment to a map for the native channel.
   Map<String, dynamic> toMap() => {
         'total': total,
         'title': title,
@@ -78,21 +76,13 @@ class SumupPayment {
       };
 }
 
-/// Supported card types for checkout.
-
 enum CardType {
-  /// Debit card.
   debit,
-
-  /// Credit card.
   credit,
 }
 
 /// Payment method for checkout: card reader (hardware) or Tap-to-Pay (device NFC).
 enum PaymentMethod {
-  /// Traditional card reader terminal.
   cardReader,
-
-  /// Tap-to-Pay via device NFC (SumUp Solo / SumUp Air).
   tapToPay,
 }
