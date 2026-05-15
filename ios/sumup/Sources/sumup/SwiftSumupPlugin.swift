@@ -2,10 +2,10 @@ import Flutter
 import SumUpSDK
 import UIKit
 
-public class SwiftSumupPlugin: NSObject, FlutterPlugin {
+public class SumupPlugin: NSObject, FlutterPlugin {
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "sumup", binaryMessenger: registrar.messenger())
-        let instance = SwiftSumupPlugin()
+        let instance = SumupPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
     }
     
@@ -20,13 +20,14 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        let pluginResponse = SumupPluginResponse(methodName: call.method, status: true)
-        
         switch call.method {
         case "initSDK":
-            let initResult = initSDK(affiliateKey: call.arguments as! String)
-            pluginResponse.message = ["result": initResult]
-            result(pluginResponse.toDictionary())
+            guard let args = call.arguments as? String else {
+                respond(result, method: "initSDK", status: false, message: ["errors": "Expected String"])
+                return
+            }
+            let initResult = initSDK(affiliateKey: args)
+            respond(result, method: "initSDK", message: ["result": initResult])
             
         case "login":
             self.login { success, reason in
@@ -36,7 +37,11 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
             }
 
         case "loginWithToken":
-            self.loginWithToken(token: call.arguments as! String) { success, reason in
+            guard let args = call.arguments as? String else {
+                result(FlutterError(code: "INVALID_ARGS", message: "Expected String", details: nil))
+                return
+            }
+            self.loginWithToken(token: args) { success, reason in
                 pluginResponse.status = success
                 pluginResponse.message = ["result": reason]
                 result(pluginResponse.toDictionary())
@@ -44,27 +49,21 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
             
         case "isLoggedIn":
             let isLoggedIn = self.isLoggedIn()
-            pluginResponse.message = ["result": isLoggedIn]
-            pluginResponse.status = isLoggedIn
-            result(pluginResponse.toDictionary())
+            respond(result, method: "isLoggedIn", status: isLoggedIn, message: ["result": isLoggedIn])
             
         case "getMerchant":
             let merchant = self.getMerchant()
-            pluginResponse.message = ["merchantCode": merchant?.merchantCode ?? "", "currencyCode": merchant?.currencyCode ?? ""]
-            result(pluginResponse.toDictionary())
+            respond(result, method: "getMerchant", message: ["merchantCode": merchant?.merchantCode ?? "", "currencyCode": merchant?.currencyCode ?? ""])
             
         case "openSettings":
             self.openSettings
             { (error: String) in
-                pluginResponse.message = ["result": error]
-                result(pluginResponse.toDictionary())
+                self.respond(result, method: "openSettings", message: ["result": error])
             }
 
         case "prepareForCheckout":
             self.prepareForCheckout()
-            pluginResponse.status = true
-            pluginResponse.message = ["result": "ok"]
-            result(pluginResponse.toDictionary())
+            respond(result, method: "prepareForCheckout", message: ["result": "ok"])
             
         case "checkTapToPayAvailability":
             SumUpSDK.checkTapToPayAvailability { [weak self] isAvailable, isActivated, error in
@@ -89,36 +88,67 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
             }
 
         case "checkout":
-            let args = call.arguments as! [String: Any]
-            let payment = args["payment"] as! [String: Any]
+            guard let args = call.arguments as? [String: Any],
+                  let payment = args["payment"] as? [String: Any],
+                  let totalValue = payment["total"],
+                  let currency = payment["currency"] as? String else {
+                result(FlutterError(code: "INVALID_ARGS", message: "Expected payment map with total and currency", details: nil))
+                return
+            }
+            let totalDecimal: Decimal
+            if let d = totalValue as? Double {
+                totalDecimal = Decimal(d)
+            } else if let s = totalValue as? String, let d = Decimal(string: s) {
+                totalDecimal = d
+            } else {
+                result(FlutterError(code: "INVALID_ARGS", message: "Invalid total format", details: nil))
+                return
+            }
             let paymentMethodStr = args["paymentMethod"] as? String ?? "cardReader"
 
-            let request = CheckoutRequest(total: NSDecimalNumber(floatLiteral: payment["total"] as! Double), title: payment["title"] as? String, currencyCode: payment["currency"] as! String)
+            let request = CheckoutRequest(total: NSDecimalNumber(decimal: totalDecimal), title: payment["title"] as? String, currencyCode: currency)
 
             if paymentMethodStr == "tapToPay" {
                 request.paymentMethod = .tapToPay
             }
 
             request.foreignTransactionID = payment["foreignTransactionId"] as? String
-            request.tipAmount = NSDecimalNumber(floatLiteral: payment["tip"] as! Double)
+            
+            let tipValue = payment["tip"]
+            if let tipD = tipValue as? Double, tipD > 0 {
+                request.tipAmount = NSDecimalNumber(decimal: Decimal(tipD))
+            } else if let tipS = tipValue as? String, let tipDec = Decimal(string: tipS), tipDec > 0 {
+                request.tipAmount = NSDecimalNumber(decimal: tipDec)
+            }
 
             let cardType = payment["cardType"] as? String
             if cardType != nil {
                 request.processAs = cardType == "credit" ? ProcessAs.credit : ProcessAs.debit
+                if cardType == "credit", let installments = payment["installments"] as? Int {
+                    request.numberOfInstallments = installments
+                }
             }
 
-            let tipOnCardReader = payment["tipOnCardReader"] as! Bool
+            let tipOnCardReader = payment["tipOnCardReader"] as? Bool ?? false
             if (tipOnCardReader && isTipOnCardReaderAvailable())
             {
                 request.tipOnCardReaderIfAvailable = tipOnCardReader
             }
 
-            request.saleItemsCount = payment["saleItemsCount"] as! UInt
+            request.saleItemsCount = payment["saleItemsCount"] as? UInt ?? 0
+            
+            if let tipRates = payment["customTipRates"] as? [Int], !tipRates.isEmpty {
+                request.customTipRates = tipRates.map { NSNumber(value: $0) }
+            }
+            
+            if let timeout = payment["successScreenTimeout"] as? Int {
+                request.successScreenTimeout = TimeInterval(timeout)
+            }
 
-            if payment["skipSuccessScreen"] as! Bool {
+            if payment["skipSuccessScreen"] as? Bool ?? false {
                 request.skipScreenOptions.update(with: SkipScreenOptions.success)
             }
-            if payment["skipFailureScreen"] as! Bool {
+            if payment["skipFailureScreen"] as? Bool ?? false {
                 request.skipScreenOptions.update(with: SkipScreenOptions.failed)
             }
 
@@ -178,6 +208,17 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
                 result(pluginResponse.toDictionary())
             })
             
+        case "lastReaderStatus":
+            let status = SumUpSDK.lastReaderStatus
+            pluginResponse.message = [
+                "serialNumber": status?.serialNumber ?? "",
+                "batteryLevel": status?.batteryLevel ?? 0,
+                "isActive": status?.isActive ?? false,
+                "readerType": String(describing: status?.readerType)
+            ]
+            pluginResponse.status = status != nil
+            result(pluginResponse.toDictionary())
+            
         default:
             pluginResponse.status = false
             pluginResponse.message = ["result": "Method not implemented"]
@@ -186,39 +227,27 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
     }
     
     private func initSDK(affiliateKey: String) -> Bool {
-        let setupResult = SumUpSDK.setup(withAPIKey: affiliateKey)
+        let setupResult = SumUpSDK.setup(affiliateKey: affiliateKey)
         return setupResult
     }
     
     private func login(completion: @escaping ((Bool, String) -> Void)) {
-        guard !self.isLoggedIn() else {
+        guard !isLoggedIn() else {
             completion(false, "Already logged in")
             return
         }
-        
-        SumUpSDK.presentLogin(from: topController(), animated: true)
-        { loggedIn, err in
-            if !loggedIn {
-                completion(loggedIn, err != nil ? err.debugDescription : "Login dialog closed")
-            } else {
-                completion(loggedIn, "Login successful")
-            }
+        SumUpSDK.presentLogin(from: topController(), animated: true) { loggedIn, err in
+            completion(loggedIn, err != nil ? err.debugDescription : (loggedIn ? "Login successful" : "Login dialog closed"))
         }
     }
 
     private func loginWithToken(token: String, completion: @escaping ((Bool, String) -> Void)) {
-        guard !self.isLoggedIn() else {
+        guard !isLoggedIn() else {
             completion(false, "Already logged in")
             return
         }
-        
-        SumUpSDK.login(withToken: token)
-        { loggedIn, err in
-            if !loggedIn {
-                completion(loggedIn, err != nil ? err.debugDescription : "Token login failed")
-            } else {
-                completion(loggedIn, "Login successful")
-            }
+        SumUpSDK.login(withToken: token) { loggedIn, err in
+            completion(loggedIn, err != nil ? err.debugDescription : (loggedIn ? "Login successful" : "Token login failed"))
         }
     }
 
@@ -232,7 +261,7 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
     
     // Returns "ok" if everything is ok, otherwise returns the error message
     private func openSettings(completion: @escaping ((String) -> Void)) {
-        SumUpSDK.presentCheckoutPreferences(from: topController(), animated: true)
+        SumUpSDK.presentCardReaderSettings(from: topController(), animated: true)
         { (_: Bool, presentationError: Error?) in
             guard let safeError = presentationError as NSError? else {
                 completion("ok")
@@ -256,19 +285,18 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
         }
     }
 
+    // MARK: - Private helpers
+
+    private func respond(_ result: @escaping FlutterResult,
+                         method: String,
+                         status: Bool = true,
+                         message: [String: Any] = [:]) {
+        let response = SumupPluginResponse(methodName: method, status: status, message: message)
+        result(response.toDictionary())
+    }
+
     private func prepareForCheckout() {
         SumUpSDK.prepareForCheckout()
-    }
-    
-    private func checkout(request: CheckoutRequest, completion: @escaping ((CheckoutResult) -> Void)) {
-        SumUpSDK.checkout(with: request, from: topController())
-        { (result: CheckoutResult?, _: Error?) in
-            if result != nil {
-                completion(result!)
-            } else {
-                completion(CheckoutResult())
-            }
-        }
     }
     
     private func isCheckoutInProgress() -> Bool {
@@ -284,13 +312,8 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
     }
     
     private func logout(completion: @escaping ((Bool) -> Void)) {
-        SumUpSDK.logout
-        { (_: Bool, error: Error?) in
-            guard (error as NSError?) != nil else {
-                return completion(true)
-            }
-            
-            return completion(false)
+        SumUpSDK.logout { _, error in
+            completion(error == nil)
         }
     }
 }

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+// ignore_for_file: public_member_api_docs, unawaited_futures, use_key_in_widget_constructors
 import 'dart:io';
 import 'dart:developer';
 
@@ -18,7 +20,7 @@ class MyApp extends StatelessWidget {
 }
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   final String affiliateKey = 'your-affiliate-key';
 
@@ -87,12 +89,11 @@ class HomeScreen extends StatelessWidget {
               print(checkout);
               if (context.mounted) {
                 final productsText = checkout.products != null && checkout.products!.isNotEmpty
-                    ? '\n\nProducts:\n' +
-                        checkout.products!
+                        ? '\n\nProducts:\n${checkout.products!
                             .map((p) => '- ${p.name} x${p.quantity} @ ${p.price}')
-                            .join('\n')
+                            .join('\n')}'
                     : '';
-                showDialog(
+                showDialog<void>(
                   context: context,
                   builder: (ctx) => AlertDialog(
                     title: Text(checkout.success == true ? 'Checkout OK' : 'Checkout fallito'),
@@ -151,7 +152,7 @@ class HomeScreen extends StatelessWidget {
               try {
                 var availability = await Sumup.checkTapToPayAvailability();
                 if (context.mounted) {
-                  showDialog(
+                  showDialog<void>(
                     context: context,
                     builder: (ctx) => AlertDialog(
                       title: const Text('TTP availability'),
@@ -236,7 +237,7 @@ class HomeScreen extends StatelessWidget {
                 if (context.mounted) {
                   final isError = checkout.success == false ||
                       (checkout.errors != null && checkout.errors!.isNotEmpty);
-                  showDialog(
+                  showDialog<void>(
                     context: context,
                     builder: (ctx) => AlertDialog(
                       title: Text(isError ? 'Transazione non riuscita' : 'Checkout'),
