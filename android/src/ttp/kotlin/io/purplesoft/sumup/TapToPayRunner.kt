@@ -17,6 +17,12 @@ import java.util.UUID
 /**
  * Runs Tap-to-Pay SDK flows (utopia-sdk dependency required).
  * See ANDROID_TTP.md.
+ *
+ * This file lives in the `ttp` source set and is compiled ONLY when the build is
+ * configured with the SumUp Tap-to-Pay Maven credentials (SUMUP_TTP_MAVEN_USERNAME).
+ * When those credentials are absent, the no-op stub in `src/nottp` is compiled instead,
+ * so the plugin (and any consuming app) builds without access to the private utopia-sdk
+ * Maven repository. See android/build.gradle.
  */
 internal object TapToPayRunner {
 

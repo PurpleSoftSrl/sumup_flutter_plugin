@@ -14,6 +14,14 @@ buildscript {
     }
 }
 
+// Tap-to-Pay (utopia-sdk) is hosted on a private SumUp Maven repo that requires partner
+// credentials. When SUMUP_TTP_MAVEN_USERNAME is provided (gradle.properties / -P / env),
+// the real Tap-to-Pay implementation (src/ttp) + the utopia-sdk dependency are compiled in.
+// Otherwise the no-op stub (src/nottp) is used and the private repo is never contacted, so
+// the plugin builds anywhere. The card-reader (merchant-sdk) path works in both modes.
+def ttpUser = (rootProject.findProperty('SUMUP_TTP_MAVEN_USERNAME') ?: '').toString().trim()
+def ttpEnabled = !ttpUser.isEmpty()
+
 rootProject.allprojects {
     repositories {
         google()
@@ -25,15 +33,17 @@ rootProject.allprojects {
                 includeGroup 'net.sf.smc'
             }
         }
-        maven {
-            url = uri('https://tap-to-pay-sdk.fleet.live.sumup.net/')
-            content {
-                includeGroupByRegex 'com\\.sumup.*'
-                includeGroup 'ca.amadis.agnos'
-            }
-            credentials {
-                username = rootProject.findProperty('SUMUP_TTP_MAVEN_USERNAME')?.toString() ?: ''
-                password = rootProject.findProperty('SUMUP_TTP_MAVEN_PASSWORD')?.toString() ?: ''
+        if (ttpEnabled) {
+            maven {
+                url = uri('https://tap-to-pay-sdk.fleet.live.sumup.net/')
+                content {
+                    includeGroup 'com.sumup.tap-to-pay'
+                    includeGroup 'ca.amadis.agnos'
+                }
+                credentials {
+                    username = rootProject.findProperty('SUMUP_TTP_MAVEN_USERNAME')?.toString() ?: ''
+                    password = rootProject.findProperty('SUMUP_TTP_MAVEN_PASSWORD')?.toString() ?: ''
+                }
             }
         }
     }
@@ -64,6 +74,8 @@ android {
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
+        // Compile either the real Tap-to-Pay runner (needs utopia-sdk) or the no-op stub.
+        main.java.srcDirs += (ttpEnabled ? 'src/ttp/kotlin' : 'src/nottp/kotlin')
     }
 
     lint {
@@ -76,5 +88,8 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"
     implementation "com.google.android.gms:play-services-location:21.3.0"
     api 'com.sumup:merchant-sdk:6.0.0'
-    implementation 'com.sumup.tap-to-pay:utopia-sdk:1.0.6'
+    // Tap-to-Pay SDK: only when partner Maven credentials are supplied (see note above).
+    if (ttpEnabled) {
+        implementation 'com.sumup.tap-to-pay:utopia-sdk:1.0.6'
+    }
 }
