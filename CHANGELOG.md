@@ -1,3 +1,7 @@
+## 0.14.2
+
+* Android: make Tap-to-Pay (`utopia-sdk`) optional, keyed on the `SUMUP_TTP_MAVEN_USERNAME` Gradle property (#74). When the property is absent, the plugin compiles a no-op `TapToPayRunner` stub (`src/nottp`) and never contacts the private SumUp Tap-to-Pay Maven repo, so consuming apps and CI build without partner credentials (previously a hard `401` on `utopia-sdk`). When the property is present, the real implementation (`src/ttp`) and the `utopia-sdk` dependency are compiled in. The card-reader (merchant-sdk) checkout path is unchanged in both modes.
+
 ## 0.14.1
 
 * Android: propagate `affiliateData` in Tap-to-Pay checkout (#68)
