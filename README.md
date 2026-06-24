@@ -160,14 +160,23 @@ Accept contactless payments directly on compatible smartphones, without any addi
 
 ### Android
 
+> **Tap-to-Pay is opt-in (since 0.14.2).** The TTP SDK (`com.sumup.tap-to-pay:utopia-sdk`) lives in a
+> private SumUp Maven repository. By **default the plugin builds without it** — no credentials, no
+> private-repo access, no `401`. The card-reader (`merchant-sdk`) checkout path works fully in this mode.
+> You only need the steps below if you actually want Tap-to-Pay. (If you previously hit
+> `Could not resolve com.sumup.tap-to-pay:utopia-sdk … 401 Unauthorized`, upgrade to **0.14.2+** and
+> simply don't set the property.)
+
 **Requirements:**
 - NFC-enabled physical device, Android 11 (API 30)+
-- The TTP SDK is distributed via a private SumUp Maven repository — contact `integration@sumup.com` to get credentials, then add them to your `gradle.properties`:
+- Get Tap-to-Pay Maven credentials from SumUp (contact `integration@sumup.com`), then add them to your
+  app's `gradle.properties` (or pass via `-P` / environment). The plugin reads `SUMUP_TTP_MAVEN_USERNAME`:
+  when it is present, the plugin **automatically** wires the private Maven repo and compiles the
+  `utopia-sdk` dependency — you do **not** add it to your own `build.gradle`.
   ```
   SUMUP_TTP_MAVEN_USERNAME=...
   SUMUP_TTP_MAVEN_PASSWORD=...
   ```
-- Add the `utopia-sdk` dependency to your app's `build.gradle` (same version used by the plugin) and configure the Maven repository. See `example/android/` for a full working setup.
 - TTP **requires a release build**: the SDK performs device attestation and will refuse to run if USB Debugging or Developer Options are enabled.
 
 **Usage:**
