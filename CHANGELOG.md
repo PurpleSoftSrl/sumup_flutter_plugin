@@ -1,3 +1,13 @@
+## 0.14.3
+
+* Android: declare the Compose BOM (`androidx.compose:compose-bom:2023.06.01`) explicitly (#78). The
+  SumUp `merchant-sdk:6.0.0` → `txresult:6.0.0` transitive dependency references Compose artifacts
+  (`material`, `material3`, `material3-window-size-class`, `ui-tooling-preview`) WITHOUT versions,
+  expecting that BOM; some consumer Gradle setups didn't apply the transitive BOM and failed with
+  `Could not find androidx.compose...:.` on `:sumup:debugCompileClasspath`. The BOM is now pinned to
+  the exact version merchant-sdk targets and exposed via `api` so both the plugin and consumers get
+  consistent Compose version constraints.
+
 ## 0.14.2
 
 * Android: make Tap-to-Pay (`utopia-sdk`) optional, keyed on the `SUMUP_TTP_MAVEN_USERNAME` Gradle property (#74). When the property is absent, the plugin compiles a no-op `TapToPayRunner` stub (`src/nottp`) and never contacts the private SumUp Tap-to-Pay Maven repo, so consuming apps and CI build without partner credentials (previously a hard `401` on `utopia-sdk`). When the property is present, the real implementation (`src/ttp`) and the `utopia-sdk` dependency are compiled in. The card-reader (merchant-sdk) checkout path is unchanged in both modes.
