@@ -12,12 +12,14 @@ let package = Package(
         .library(name: "sumup", targets: ["sumup"])
     ],
     dependencies: [
-        .package(url: "https://github.com/sumup/sumup-ios-sdk.git", from: "6.2.1"),
+        .package(name: "FlutterFramework", path: "../FlutterFramework"),
+        .package(url: "https://github.com/sumup/sumup-ios-sdk.git", from: "7.1.2"),
     ],
     targets: [
         .target(
             name: "sumup",
             dependencies: [
+                .product(name: "FlutterFramework", package: "FlutterFramework"),
                 .product(name: "SumUpSDK", package: "sumup-ios-sdk"),
             ],
             resources: []

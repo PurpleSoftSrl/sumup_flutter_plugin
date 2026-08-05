@@ -53,8 +53,49 @@ Support this project by purchasing SumUp terminals through our affiliate links f
 1. Registered for a merchant account via SumUp's [country websites](https://sumup.it/purplesoft) (or received a test account).
 2. Received a SumUp card terminal: Solo, Air, Air Lite, PIN+ terminal, Chip & Signature reader, or SumUp Air Register.
 3. Requested an Affiliate (Access) Key and registered your application ID via the [SumUp Dashboard](https://me.sumup.com/developers).
-4. iOS deployment target 16.0+ (16.4+ for Tap-to-Pay).
-5. Android minSdkVersion 26+ (30+ for Tap-to-Pay).
+4. Flutter 3.44+ and Dart 3.12+.
+5. iOS deployment target 16.0+ and Xcode 26.2+ (iOS 16.7+ for Tap-to-Pay; 17.5+ recommended).
+6. Android minSdkVersion 26+ (30+ for Tap-to-Pay), targetSdkVersion 36, Java 17, Android Gradle Plugin 9.2.1, and Gradle 9.5.1.
+
+## Migrating from 0.14.x
+
+Version 0.15.0 adopts the native SDK 7.x toolchains.
+
+- Upgrade the app to Flutter 3.44+ / Dart 3.12+. SumUp Android SDK 7.1 requires Kotlin 2.4.0,
+  while Flutter 3.44 still needs its temporary AGP 9 compatibility mode for this explicit KGP
+  version. In the host app's `android/gradle.properties`, set:
+  ```properties
+  android.builtInKotlin=false
+  android.newDsl=false
+  ```
+  Declare `org.jetbrains.kotlin.android` version `2.4.0` with `apply false` in
+  `android/settings.gradle`:
+  ```groovy
+  plugins {
+      id "org.jetbrains.kotlin.android" version "2.4.0" apply false
+  }
+  ```
+  Then apply it in `android/app/build.gradle`:
+  ```groovy
+  plugins {
+      id "org.jetbrains.kotlin.android"
+  }
+  ```
+  Flutter 3.44 reports this legacy-KGP path as temporary; keep the two compatibility flags until
+  Flutter can use the vendor-required Kotlin version through AGP's built-in Kotlin integration.
+- Compile and target Android API 36 with Java 17, AGP 9.2.1, and Gradle 9.5.1.
+- Keep Android minSdk 26 for card-reader-only apps. Configuring Tap-to-Pay credentials enables the
+  TTP implementation; the host app must then also set minSdk to 30.
+- Use an iOS 16 deployment target with Xcode 26.2 or later. Swift Package Manager is recommended;
+  SumUp will stop publishing new CocoaPods SDK releases after October 31, 2026.
+
+> **Android rollback warning:** after an app has initialized SumUp Android SDK 7.1.0, downgrading
+> that installation to a version backed by an older native SDK is not supported. Validate the
+> migration with a sandbox merchant and use a staged rollout.
+
+> **iOS rollback warning:** before downgrading from SumUp iOS SDK 7.1.2, upload all pending Offline
+> Payments. If a downgrade is unavoidable, upload them first, delete the app, and then install the
+> version backed by the older SDK.
 
 ## Installing
 
@@ -145,7 +186,7 @@ Accept contactless payments directly on compatible smartphones, without any addi
 ### iOS
 
 **Requirements:**
-- iPhone XS or later, iOS 16.4+
+- iPhone XS or later, iOS 16.7+ (17.5+ recommended); iPad is not supported
 - Entitlement `com.apple.developer.proximity-reader.payment.acceptance` added to your project (requires approval from Apple)
 - See [Apple's HIG for Tap to Pay on iPhone](https://developer.apple.com/design/human-interface-guidelines/tap-to-pay-on-iphone)
 
@@ -169,15 +210,33 @@ Accept contactless payments directly on compatible smartphones, without any addi
 
 **Requirements:**
 - NFC-enabled physical device, Android 11 (API 30)+
+- Set the host application's `minSdk` to 30 when enabling Tap-to-Pay.
+- Enable core-library desugaring in the host app module, as required by Tap-to-Pay 1.1.1+:
+  ```groovy
+  android {
+      compileOptions {
+          coreLibraryDesugaringEnabled true
+      }
+  }
+
+  dependencies {
+      coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
+  }
+  ```
 - Get Tap-to-Pay Maven credentials from SumUp (contact `integration@sumup.com`), then add them to your
-  app's `gradle.properties` (or pass via `-P` / environment). The plugin reads `SUMUP_TTP_MAVEN_USERNAME`:
-  when it is present, the plugin **automatically** wires the private Maven repo and compiles the
+  user-level `~/.gradle/gradle.properties` (or pass them via `-P` / environment). Do not commit the
+  credentials to the app repository. The plugin reads both credentials and **automatically** wires
+  the private Maven repo and compiles the
   `utopia-sdk` dependency — you do **not** add it to your own `build.gradle`.
   ```
   SUMUP_TTP_MAVEN_USERNAME=...
   SUMUP_TTP_MAVEN_PASSWORD=...
   ```
-- TTP **requires a release build**: the SDK performs device attestation and will refuse to run if USB Debugging or Developer Options are enabled.
+  For environment-only configuration, use the names above or Gradle's standard
+  `ORG_GRADLE_PROJECT_SUMUP_TTP_MAVEN_USERNAME` and
+  `ORG_GRADLE_PROJECT_SUMUP_TTP_MAVEN_PASSWORD` variables.
+- SumUp sandbox merchants can test with a debuggable build. Live merchants require a
+  non-debuggable build with USB Debugging and Developer Options disabled.
 
 **Usage:**
 1. You must use `Sumup.loginWithToken(accessToken)` — token login is required for the TTP SDK to authenticate in the background.

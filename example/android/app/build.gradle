@@ -1,7 +1,13 @@
 plugins {
     id "com.android.application"
-    id "kotlin-android"
+    id "org.jetbrains.kotlin.android"
     id "dev.flutter.flutter-gradle-plugin"
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+    }
 }
 
 def localProperties = new Properties()
@@ -25,7 +31,7 @@ if (flutterVersionName == null) {
 android {
     namespace "io.purplesoft.sumup_example"
 
-    compileSdkVersion 35
+    compileSdk = 36
 
     compileOptions {
         coreLibraryDesugaringEnabled true
@@ -33,18 +39,14 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = '17'
-    }
-
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
+    sourceSets.named('main') {
+        kotlin.directories.add('src/main/kotlin')
     }
 
     defaultConfig {
         applicationId "io.purplesoft.sumup_example"
-        minSdkVersion 30  // required by Tap-to-Pay SDK
-        targetSdkVersion 35
+        minSdk = rootProject.ext.sumupTtpEnabled ? 30 : 26
+        targetSdk = 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
@@ -69,5 +71,4 @@ flutter {
 
 dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
-    implementation 'com.sumup.tap-to-pay:utopia-sdk:1.0.6'
 }

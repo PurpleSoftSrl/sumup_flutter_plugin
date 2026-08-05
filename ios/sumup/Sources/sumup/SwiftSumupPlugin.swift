@@ -93,21 +93,37 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
             let payment = args["payment"] as! [String: Any]
             let paymentMethodStr = args["paymentMethod"] as? String ?? "cardReader"
 
-            let request = CheckoutRequest(total: NSDecimalNumber(floatLiteral: payment["total"] as! Double), title: payment["title"] as? String, currencyCode: payment["currency"] as! String)
+            let total = payment["total"] as! Double
+            guard total.isFinite && total >= 0 else {
+                pluginResponse.status = false
+                pluginResponse.message = ["success": false, "errors": "total must be finite and non-negative"]
+                result(pluginResponse.toDictionary())
+                return
+            }
+            let request = CheckoutRequest(total: NSDecimalNumber(string: String(total)), title: payment["title"] as? String, currencyCode: payment["currency"] as! String)
 
             if paymentMethodStr == "tapToPay" {
                 request.paymentMethod = .tapToPay
             }
 
             request.foreignTransactionID = payment["foreignTransactionId"] as? String
-            request.tipAmount = NSDecimalNumber(floatLiteral: payment["tip"] as! Double)
+            let tip = payment["tip"] as! Double
+            let tipOnCardReader = payment["tipOnCardReader"] as! Bool
+            guard tip.isFinite && tip >= 0 else {
+                pluginResponse.status = false
+                pluginResponse.message = ["success": false, "errors": "tip must be finite and non-negative"]
+                result(pluginResponse.toDictionary())
+                return
+            }
+            if tip > 0 && !tipOnCardReader {
+                request.tipAmount = NSDecimalNumber(string: String(tip))
+            }
 
             let cardType = payment["cardType"] as? String
             if cardType != nil {
                 request.processAs = cardType == "credit" ? ProcessAs.credit : ProcessAs.debit
             }
 
-            let tipOnCardReader = payment["tipOnCardReader"] as! Bool
             if (tipOnCardReader && isTipOnCardReaderAvailable())
             {
                 request.tipOnCardReaderIfAvailable = tipOnCardReader
@@ -186,7 +202,7 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
     }
     
     private func initSDK(affiliateKey: String) -> Bool {
-        let setupResult = SumUpSDK.setup(withAPIKey: affiliateKey)
+        let setupResult = SumUpSDK.setup(affiliateKey: affiliateKey)
         return setupResult
     }
     
@@ -232,7 +248,7 @@ public class SwiftSumupPlugin: NSObject, FlutterPlugin {
     
     // Returns "ok" if everything is ok, otherwise returns the error message
     private func openSettings(completion: @escaping ((String) -> Void)) {
-        SumUpSDK.presentCheckoutPreferences(from: topController(), animated: true)
+        SumUpSDK.presentCardReaderSettings(from: topController(), animated: true)
         { (_: Bool, presentationError: Error?) in
             guard let safeError = presentationError as NSError? else {
                 completion("ok")

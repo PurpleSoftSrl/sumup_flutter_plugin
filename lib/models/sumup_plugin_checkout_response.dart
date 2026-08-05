@@ -1,6 +1,11 @@
-import 'dart:io';
-
 import 'sumup_product.dart';
+
+double? _parseDouble(Object? value) {
+  if (value is num) {
+    return value.toDouble();
+  }
+  return double.tryParse(value?.toString() ?? '');
+}
 
 /// Checkout response object.
 ///
@@ -31,13 +36,16 @@ class SumupPluginCheckoutResponse {
   SumupPluginCheckoutResponse.fromMap(Map<dynamic, dynamic> response) {
     success = response['success'];
     transactionCode = response['transactionCode'];
-    amount = response['amount'];
+    amount = _parseDouble(response['amount']);
     currency = response['currency'];
-    vatAmount = response['vatAmount'];
-    tipAmount = response['tipAmount'];
+    vatAmount = _parseDouble(response['vatAmount']);
+    tipAmount = _parseDouble(response['tipAmount']);
     paymentType = response['paymentType'];
     entryMode = response['entryMode'];
-    installments = int.tryParse(response['installments'].toString());
+    final rawInstallments = response['installments'];
+    installments = rawInstallments is num
+        ? rawInstallments.toInt()
+        : int.tryParse(rawInstallments?.toString() ?? '');
     cardType = response['cardType'];
     cardLastDigits = response['cardLastDigits'];
     userDismissedSuccessScreen = response['userDismissedSuccessScreen'] as bool?;
@@ -52,11 +60,8 @@ class SumupPluginCheckoutResponse {
           .toList();
     }
 
-    // some parameters are available only for Android
-    if (Platform.isAndroid) {
-      foreignTransactionId = response['foreignTransactionId'];
-      receiptSent = response['receiptSent'];
-    }
+    foreignTransactionId = response['foreignTransactionId'];
+    receiptSent = response['receiptSent'];
   }
 
   /// Transaction's outcome

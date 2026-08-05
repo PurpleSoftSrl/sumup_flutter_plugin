@@ -12,6 +12,8 @@ import com.sumup.taptopay.payment.domain.model.api.PaymentEvent
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.util.UUID
 
 /**
@@ -19,7 +21,7 @@ import java.util.UUID
  * See ANDROID_TTP.md.
  *
  * This file lives in the `ttp` source set and is compiled ONLY when the build is
- * configured with the SumUp Tap-to-Pay Maven credentials (SUMUP_TTP_MAVEN_USERNAME).
+ * configured with both SumUp Tap-to-Pay Maven credentials.
  * When those credentials are absent, the no-op stub in `src/nottp` is compiled instead,
  * so the plugin (and any consuming app) builds without access to the private utopia-sdk
  * Maven repository. See android/build.gradle.
@@ -48,6 +50,24 @@ internal object TapToPayRunner {
     private fun isAppDebuggable(context: Context): Boolean =
         (context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
 
+    private fun toMinorUnits(amount: Number?, fieldName: String): Long {
+        val value = amount ?: 0
+        val decimal = when (value) {
+            is Byte, is Short, is Int, is Long -> BigDecimal.valueOf(value.toLong())
+            is Float, is Double -> {
+                val floatingPointValue = value.toDouble()
+                require(floatingPointValue.isFinite()) { "$fieldName must be finite." }
+                BigDecimal.valueOf(floatingPointValue)
+            }
+            else -> BigDecimal(value.toString())
+        }
+        require(decimal.signum() >= 0) { "$fieldName must not be negative." }
+        return decimal
+            .movePointRight(2)
+            .setScale(0, RoundingMode.HALF_UP)
+            .longValueExact()
+    }
+
     /** Maps SDK init/attestation errors to a user-friendly message. */
     private fun messageForInitError(e: Throwable, applicationContext: Context? = null): String {
         val root = e.cause ?: e
@@ -58,10 +78,10 @@ internal object TapToPayRunner {
             msg.contains("attestation") ||
             cls.contains("Attestation")
         if (isAttestationOrUt && applicationContext != null && isAppDebuggable(applicationContext)) {
-            return "Tap-to-Pay requires a release build (debug builds fail attestation). Use: flutter run --release or install a release APK."
+            return "Tap-to-Pay initialization was rejected for this debuggable build. Live merchants require a non-debuggable release build; sandbox merchants can use debug builds."
         }
         if (isAttestationOrUt) {
-            return "Tap-to-Pay init failed: use a release build (flutter run --release), disable USB debugging and Developer mode, then retry."
+            return "Tap-to-Pay device attestation failed. For live merchants, use a non-debuggable release build and check the device security settings."
         }
         if (msg.isNotBlank()) return msg
         return cls.substringAfterLast('.').ifBlank { root.javaClass.simpleName ?: "Init failed" }
@@ -71,7 +91,7 @@ internal object TapToPayRunner {
         if (err.isNullOrBlank()) return "Transaction failed"
         return when {
             err.contains("UsbDebuggingEnabled") -> "Disable USB debugging in Developer Options to use Tap to Pay."
-            err.contains("AppDebuggable") -> "Tap to Pay requires a release build (not debug)."
+            err.contains("AppDebuggable") -> "This Tap-to-Pay merchant rejected a debuggable app. Live merchants require a non-debuggable release build."
             err.contains("Attestation") -> "Device attestation failed. Disable USB debugging and Developer Options, then retry."
             err.contains("CheckoutFailed") -> "Checkout failed. Please try again."
             else -> err
@@ -85,7 +105,6 @@ internal object TapToPayRunner {
     ): Triple<Boolean, Boolean, String?> = runCatching {
         if (accessToken.isNullOrBlank()) return Triple(false, false, "No token: call loginWithToken first")
         if (android.os.Build.VERSION.SDK_INT < 30) return Triple(false, false, "Tap-to-Pay requires Android 11+ (API 30)")
-        if (isAppDebuggable(applicationContext)) return Triple(false, false, "Tap-to-Pay requires a release build (debug fails attestation). Use: flutter run --release or install a release APK.")
         val tapToPay = getTapToPay(applicationContext)
             ?: return Triple(false, false, "Tap-to-Pay SDK not loaded (utopia-sdk + Maven credentials)")
         val authProvider = object : AuthTokenProvider {
@@ -133,10 +152,6 @@ internal object TapToPayRunner {
             onResult(mapOf("success" to false, "errors" to "Tap-to-Pay SDK not available."))
             return
         }
-        if (isAppDebuggable(applicationContext)) {
-            onResult(mapOf("success" to false, "errors" to "Tap-to-Pay requires a release build (debug fails attestation). Use: flutter run --release or install a release APK."))
-            return
-        }
         try {
             if (!ttpInitDone) {
                 val authProvider = object : AuthTokenProvider {
@@ -154,10 +169,11 @@ internal object TapToPayRunner {
                 }
                 ttpInitDone = true
             }
-            val total = (payment["total"] as? Number)?.toDouble() ?: 0.0
-            val tip = (payment["tip"] as? Number)?.toDouble() ?: 0.0
-            val totalMinor = (total * 100).toLong()
-            val tipsMinor = if (tip > 0) (tip * 100).toLong() else null
+            val baseTotalMinor = toMinorUnits(payment["total"] as? Number, "total")
+            val tipMinor = toMinorUnits(payment["tip"] as? Number, "tip")
+            // The Tap-to-Pay API requires totalAmount to include the separately reported tip.
+            val totalMinor = Math.addExact(baseTotalMinor, tipMinor)
+            val tipsMinor = tipMinor.takeIf { it > 0 }
             val requestedForeignTransactionId = (payment["foreignTransactionId"] as? String)
                 ?.takeIf { it.isNotBlank() }
             val clientTxId = requestedForeignTransactionId
@@ -256,7 +272,10 @@ internal object TapToPayRunner {
 
     suspend fun tearDown(applicationContext: Context) {
         try {
-            getTapToPay(applicationContext)?.tearDown()
+            getTapToPay(applicationContext)
+                ?.tearDown()
+                ?.exceptionOrNull()
+                ?.let { Log.w(TAG, "Tap-to-Pay session teardown returned a failure.", it) }
         } catch (e: Exception) {
             Log.w(TAG, "Tap-to-Pay session teardown failed.", e)
         } finally {

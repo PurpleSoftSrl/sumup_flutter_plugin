@@ -1,3 +1,25 @@
+def resolveTtpCredential = { String name ->
+    def propertyValue = providers.gradleProperty(name).getOrNull()?.trim()
+    if (propertyValue) {
+        return propertyValue
+    }
+    return providers.environmentVariable(name).getOrNull()?.trim() ?: ''
+}
+def ttpUser = resolveTtpCredential('SUMUP_TTP_MAVEN_USERNAME')
+def ttpPassword = resolveTtpCredential('SUMUP_TTP_MAVEN_PASSWORD')
+def hasTtpUser = !ttpUser.isEmpty()
+def hasTtpPassword = !ttpPassword.isEmpty()
+
+if (hasTtpUser != hasTtpPassword) {
+    throw new GradleException(
+        'Incomplete Tap-to-Pay Maven credentials: set both ' +
+        'SUMUP_TTP_MAVEN_USERNAME and SUMUP_TTP_MAVEN_PASSWORD, or neither.'
+    )
+}
+
+def ttpEnabled = hasTtpUser && hasTtpPassword
+ext.sumupTtpEnabled = ttpEnabled
+
 allprojects {
     repositories {
         google()
@@ -9,15 +31,17 @@ allprojects {
                 includeGroup 'net.sf.smc'
             }
         }
-        maven {
-            url = uri('https://tap-to-pay-sdk.fleet.live.sumup.net/')
-            content {
-                includeGroupByRegex 'com\\.sumup.*'
-                includeGroup 'ca.amadis.agnos'
-            }
-            credentials {
-                username = project.findProperty('SUMUP_TTP_MAVEN_USERNAME')?.toString() ?: ""
-                password = project.findProperty('SUMUP_TTP_MAVEN_PASSWORD')?.toString() ?: ""
+        if (ttpEnabled) {
+            maven {
+                url = uri('https://tap-to-pay-sdk.fleet.live.sumup.net/')
+                content {
+                    includeGroup 'com.sumup.tap-to-pay'
+                    includeGroup 'ca.amadis.agnos'
+                }
+                credentials {
+                    username = ttpUser
+                    password = ttpPassword
+                }
             }
         }
     }

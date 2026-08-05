@@ -2,25 +2,41 @@ group 'io.purplesoft.sumup'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '2.1.0'
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.8.0'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.android.tools.build:gradle:9.2.1'
+        // Flutter 3.44's temporary AGP 9 compatibility mode keeps the legacy Kotlin plugin.
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.4.0'
     }
 }
 
 // Tap-to-Pay (utopia-sdk) is hosted on a private SumUp Maven repo that requires partner
-// credentials. When SUMUP_TTP_MAVEN_USERNAME is provided (gradle.properties / -P / env),
-// the real Tap-to-Pay implementation (src/ttp) + the utopia-sdk dependency are compiled in.
-// Otherwise the no-op stub (src/nottp) is used and the private repo is never contacted, so
-// the plugin builds anywhere. The card-reader (merchant-sdk) path works in both modes.
-def ttpUser = (rootProject.findProperty('SUMUP_TTP_MAVEN_USERNAME') ?: '').toString().trim()
-def ttpEnabled = !ttpUser.isEmpty()
+// credentials. Resolve each credential from a Gradle property first, then from a raw
+// environment variable. The real Tap-to-Pay implementation is enabled only when both exist.
+def resolveTtpCredential = { String name ->
+    def propertyValue = providers.gradleProperty(name).getOrNull()?.trim()
+    if (propertyValue) {
+        return propertyValue
+    }
+    return providers.environmentVariable(name).getOrNull()?.trim() ?: ''
+}
+def ttpUser = resolveTtpCredential('SUMUP_TTP_MAVEN_USERNAME')
+def ttpPassword = resolveTtpCredential('SUMUP_TTP_MAVEN_PASSWORD')
+def hasTtpUser = !ttpUser.isEmpty()
+def hasTtpPassword = !ttpPassword.isEmpty()
+
+if (hasTtpUser != hasTtpPassword) {
+    throw new GradleException(
+        'Incomplete Tap-to-Pay Maven credentials: set both ' +
+        'SUMUP_TTP_MAVEN_USERNAME and SUMUP_TTP_MAVEN_PASSWORD, or neither.'
+    )
+}
+
+def ttpEnabled = hasTtpUser && hasTtpPassword
 
 rootProject.allprojects {
     repositories {
@@ -41,8 +57,8 @@ rootProject.allprojects {
                     includeGroup 'ca.amadis.agnos'
                 }
                 credentials {
-                    username = rootProject.findProperty('SUMUP_TTP_MAVEN_USERNAME')?.toString() ?: ''
-                    password = rootProject.findProperty('SUMUP_TTP_MAVEN_PASSWORD')?.toString() ?: ''
+                    username = ttpUser
+                    password = ttpPassword
                 }
             }
         }
@@ -52,30 +68,34 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+    }
+}
+
 android {
     namespace 'io.purplesoft.sumup'
 
-    compileSdk 35
+    compileSdk = 36
 
     compileOptions {
+        coreLibraryDesugaringEnabled = true
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = '17'
-    }
-    
     defaultConfig {
-        minSdkVersion 30  // Tap-to-Pay SDK requires 30+; card reader still works
-        targetSdkVersion 35
+        // Tap-to-Pay requires API 30; the card-reader-only build supports API 26.
+        minSdk = ttpEnabled ? 30 : 26
+        targetSdk = 36
         consumerProguardFiles 'consumer-rules.pro'
     }
 
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
+    sourceSets.named('main') {
+        kotlin.directories.add('src/main/kotlin')
         // Compile either the real Tap-to-Pay runner (needs utopia-sdk) or the no-op stub.
-        main.java.srcDirs += (ttpEnabled ? 'src/ttp/kotlin' : 'src/nottp/kotlin')
+        kotlin.directories.add(ttpEnabled ? 'src/ttp/kotlin' : 'src/nottp/kotlin')
     }
 
     lint {
@@ -84,18 +104,18 @@ android {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0"
     implementation "com.google.android.gms:play-services-location:21.3.0"
     // merchant-sdk's transitive com.sumup:txresult declares Compose deps (material, material3,
     // ui-tooling-preview) WITHOUT versions, expecting the Compose BOM it references. Some consumer
     // Gradle setups don't apply that transitive BOM, leaving them unresolved ("Could not find
     // androidx.compose...:."). Declare the BOM explicitly (exact version from txresult's POM) and
     // expose it via `api` so both this module and consumers get the version constraints.
-    api platform('androidx.compose:compose-bom:2023.06.01')
-    api 'com.sumup:merchant-sdk:6.0.0'
+    api platform('androidx.compose:compose-bom:2024.09.00')
+    api 'com.sumup:merchant-sdk:7.1.0'
     // Tap-to-Pay SDK: only when partner Maven credentials are supplied (see note above).
     if (ttpEnabled) {
-        implementation 'com.sumup.tap-to-pay:utopia-sdk:1.0.6'
+        implementation 'com.sumup.tap-to-pay:utopia-sdk:1.1.5'
     }
 }

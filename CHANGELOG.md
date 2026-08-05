@@ -1,3 +1,29 @@
+## 0.15.0
+
+* Upgrade native SDKs: Android Reader `7.1.0`, Android Tap-to-Pay `1.1.5`, and iOS `7.1.2`.
+* Raise the supported toolchain to Flutter 3.44+, Dart 3.12+, Android target SDK 36, AGP 9.2.1,
+  Gradle 9.5.1, Java 17, Xcode 26.2+, and iOS 16.
+* Android: upgrade to Kotlin 2.4.0 using Flutter 3.44's temporary AGP 9 compatibility mode,
+  update the Compose BOM to `2024.09.00`, and enable core-library desugaring required by
+  Tap-to-Pay.
+* Android: keep minSdk 26 for card-reader-only builds and select minSdk 30 only when both
+  Tap-to-Pay Maven credentials are configured.
+* Android: support Tap-to-Pay credentials through Gradle properties or environment variables,
+  without tracked placeholder credentials in the example.
+* Android Tap-to-Pay: include tips in `totalAmount` and convert amounts to minor units without
+  floating-point truncation.
+* iOS: replace deprecated SDK entry points, preserve decimal precision, and omit a zero tip from
+  checkout requests.
+* Enable Swift Package Manager in the example and align all iOS deployment targets to 16.
+* Fix and expand Dart/example tests.
+
+> Android SDK 7.1.0 changes internal state in a backward-incompatible way. After running an app with
+> this version, downgrading that installation to a plugin backed by an older Android SDK is not
+> supported.
+>
+> Before downgrading from iOS SDK 7.1.2, upload all pending Offline Payments. If a downgrade is
+> unavoidable, upload them first, delete the app, and then install the older version.
+
 ## 0.14.3
 
 * Android: declare the Compose BOM (`androidx.compose:compose-bom:2023.06.01`) explicitly (#78). The
