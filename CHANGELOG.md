@@ -1,3 +1,13 @@
+## 0.15.1
+
+* Android: migrate to Built-in Kotlin (AGP 9.0 compatible); fixes #81. The plugin no longer applies
+  the Kotlin Gradle Plugin (KGP) the legacy way (dropped its own `buildscript` KGP classpath and the
+  `apply plugin: 'kotlin-android'`) and instead relies on Flutter's built-in Kotlin, keeping the
+  `kotlin { compilerOptions { jvmTarget = JVM_17 } }` DSL block. This removes Flutter's KGP
+  deprecation warning ("plugins that apply Kotlin Gradle Plugin (KGP): sumup") for consuming apps.
+  The example app's `app/build.gradle` was likewise migrated (removed `org.jetbrains.kotlin.android`).
+  Minimum Flutter 3.44 / Dart 3.12 (already required) is unchanged.
+
 ## 0.15.0
 
 * Upgrade native SDKs: Android Reader `7.1.0`, Android Tap-to-Pay `1.1.5`, and iOS `7.1.2`.
