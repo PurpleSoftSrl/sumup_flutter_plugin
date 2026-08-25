@@ -1,19 +1,6 @@
 group 'io.purplesoft.sumup'
 version '1.0-SNAPSHOT'
 
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:9.2.1'
-        // Flutter 3.44's temporary AGP 9 compatibility mode keeps the legacy Kotlin plugin.
-        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.4.0'
-    }
-}
-
 // Tap-to-Pay (utopia-sdk) is hosted on a private SumUp Maven repo that requires partner
 // credentials. Resolve each credential from a Gradle property first, then from a raw
 // environment variable. The real Tap-to-Pay implementation is enabled only when both exist.
@@ -66,7 +53,6 @@ rootProject.allprojects {
 }
 
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
 
 kotlin {
     compilerOptions {
