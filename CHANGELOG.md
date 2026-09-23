@@ -1,3 +1,10 @@
+## 0.15.2
+
+* Dependency upgrade via `flutter pub upgrade --major-versions`: no direct constraint changes were
+  needed; the plugin and example lockfiles were refreshed (`vector_math` `2.4.2` → `2.4.3`,
+  transitive). No Dart, Android or iOS source changes; the Tap-to-Pay/Android Maven setup is
+  unchanged.
+
 ## 0.15.1
 
 * Android: migrate to Built-in Kotlin (AGP 9.0 compatible); fixes #81. The plugin no longer applies
