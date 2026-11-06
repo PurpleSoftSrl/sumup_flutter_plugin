@@ -1,0 +1,23 @@
+name: Publish to pub.dev
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+' # tag pattern on pub.dev: v{{version}}
+
+jobs:
+  publish:
+    permissions:
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Creates the OIDC token that pub.dev requires.
+      - uses: dart-lang/setup-dart@v1
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      # --force uploads despite warnings, so warnings have to stop the job here.
+      - run: flutter pub publish --dry-run
+      - run: flutter pub publish --force
