@@ -1,3 +1,9 @@
+## 0.15.3
+
+* Includes 0.15.0, 0.15.1 and 0.15.2 below, which were never published to pub.dev.
+* Lockfiles refreshed (`vector_math` `2.4.4`, `vm_service` `15.4.0`).
+* Releases are now published from GitHub Actions on version tags.
+
 ## 0.15.2
 
 * Dependency upgrade via `flutter pub upgrade --major-versions`: no direct constraint changes were
